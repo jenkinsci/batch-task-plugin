@@ -6,6 +6,8 @@ import hudson.model.Hudson;
 import hudson.model.Label;
 import hudson.model.Node;
 import hudson.model.Queue;
+import hudson.model.Result;
+import hudson.model.BallColor;
 import hudson.model.Queue.Executable;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -67,6 +69,44 @@ public final class BatchTask implements Queue.Task {
 
     public Node getLastBuiltOn() {
         return owner.getLastBuiltOn();
+    }
+
+    public String getBuildStatusUrl() {
+        return getIconColor()+".gif";
+    }
+
+    public BallColor getIconColor() {
+        BatchRun r = getLastRun();
+        if(r==null) return BallColor.GREY;
+        else        return r.getIconColor();
+    }
+
+    /**
+     * Obtains the latest {@link BatchRun} record.
+     */
+    public BatchRun getLastRun() {
+        for(AbstractBuild<?,?> b : owner.getBuilds()) {
+            BatchRunAction bra = b.getAction(BatchRunAction.class);
+            if(bra==null)   continue;
+            for(BatchRun br : bra.getRecords())
+                if(br.taskName.equals(name))
+                    return br;
+        }
+        return null;
+    }
+
+    public BatchRun getLastSuccessfulRun() {
+        for(BatchRun r=getLastRun(); r!=null; r=r.getPrevious())
+            if(r.getResult()== Result.SUCCESS)
+                return r;
+        return null;
+    }
+
+    public BatchRun getLastFailedRun() {
+        for(BatchRun r=getLastRun(); r!=null; r=r.getPrevious())
+            if(r.getResult()==Result.FAILURE)
+                return r;
+        return null;
     }
 
     public Executable createExecutable() throws IOException {

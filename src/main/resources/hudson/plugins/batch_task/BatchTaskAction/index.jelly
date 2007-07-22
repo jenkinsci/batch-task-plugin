@@ -1,13 +1,51 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
-  <l:layout title="Test">
+  <d:taglib uri="local">
+    <d:tag name="lastRun">
+      <td data="${h.ifThenElse(run==null,'-',run.timestampString2)}">
+        <j:choose>
+          <j:when test="${run!=null}">
+            ${run.timestampString}
+            (<a href="${jobBaseUrl}${job.shortUrl}lastSuccessfulBuild/">#${run.id}</a>)
+          </j:when>
+          <j:otherwise>
+            N/A
+          </j:otherwise>
+        </j:choose>
+      </td>
+    </d:tag>
+  </d:taglib>
+  <l:layout title="Test" xmlns:local="local">
     <st:include page="sidepanel.jelly" it="${it.project}" />
     <l:main-panel>
       <h1>Batch Tasks</h1>
-      <table style="margin-top: 1em; margin-left:1em;">
+      <t:setIconSize/>
+      <table class="sortable pane" id="projectstatus">
+        <tr>
+          <th>S</th>
+          <th initialSortDir="down">Task</th>
+          <th>Last Success</th>
+          <th>Last Failure</th>
+          <th>Last Duration</th>
+          <th><st:nbsp/></th>
+          <l:isAdmin><!-- build icon -->
+            <th width="1"><st:nbsp/></th>
+          </l:isAdmin>
+        </tr>
         <j:forEach var="t" items="${it.tasks}">
-          <t:summary icon="gear2.gif" href="${t.name}/execute">
-            Execute "${t.name}"
-          </t:summary>
+          <tr>
+            <t:ballColorTd it="${t.iconColor}" />
+            <td>${t.name}</td>
+            <local:lastRun run="${t.lastSuccessfulRun}"/>
+            <local:lastRun run="${t.lastFailedRun}"/>
+            <td></td>
+            <l:isAdmin>
+              <td>
+                <form action="${t.name}/execute" method="post">
+                  <input type="image" src="${rootURL}/images/32x32/clock.gif" tooltip="Execute" />
+                </form>
+              </td>
+            </l:isAdmin>
+          </tr>
         </j:forEach>
       </table>
     </l:main-panel>
