@@ -8,6 +8,7 @@ import hudson.model.Node;
 import hudson.model.Queue;
 import hudson.model.Result;
 import hudson.model.BallColor;
+import hudson.model.ResourceList;
 import hudson.model.Queue.Executable;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -121,6 +122,13 @@ public final class BatchTask implements Queue.Task {
         }
 
         return records.createRecord(this);
+    }
+
+    /**
+     * {@link BatchTask} requires exclusive access to the workspace.
+     */
+    public ResourceList getResourceList() {
+        return new ResourceList().w(owner.getWorkspaceResource());
     }
 
     /**
