@@ -159,7 +159,7 @@ public final class BatchRun implements Executable, ModelObject {
      *      URL like "job/foo/53/batchTasks/0"
      */
     public String getUrl() {
-        return parent.owner.getUrl()+"batchTasks/"+id;
+        return parent.owner.getUrl()+"batchTasks/"+id+'/';
     }
 
     public String getDisplayName() {
