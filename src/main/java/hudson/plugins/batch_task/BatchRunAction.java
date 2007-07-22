@@ -10,6 +10,9 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+
 /**
  * {@link Build} {@link Action} that shows the records of executed tasks.
  * @author Kohsuke Kawaguchi
@@ -52,5 +55,10 @@ public final class BatchRunAction implements Action {
         for (BatchRun r : records)
             r.parent = this;
         return this;
+    }
+
+    public BatchRun getDynamic(String token, StaplerRequest req, StaplerResponse rsp) {
+        int i = Integer.parseInt(token);
+        return records.get(i);
     }
 }
