@@ -91,6 +91,10 @@ public final class BatchRun implements Executable, ModelObject {
         return jta.getTask(taskName);
     }
 
+    public BatchRunAction getOwner() {
+        return parent;
+    }
+
     /**
      * Gets the icon color for display.
      */
@@ -116,17 +120,33 @@ public final class BatchRun implements Executable, ModelObject {
     }
 
     /**
-     * Obtains the previous execution record.
+     * Obtains the previous execution record, or null if no such record is available.
      */
     public BatchRun getPrevious() {
         // check siblings
-        for( AbstractBuild<?,?> b = parent.owner; b!=null; b=b.getPreviousBuild()) {
+        for( AbstractBuild<?,?> b=parent.owner; b!=null; b=b.getPreviousBuild()) {
             BatchRunAction records = b.getAction(BatchRunAction.class);
             for(int i=records.records.size(); i>=0; i--) {
                 BatchRun r = records.records.get(i);
                 if( r.taskName.equals(taskName)
                  && r.timestamp.compareTo(this.timestamp)<0 ) // must be older than this
                 return r;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Obtains the next execution record, or null if no such record is available.
+     */
+    public BatchRun getNext() {
+        // check siblings
+        for( AbstractBuild<?,?> b=parent.owner; b!=null; b=b.getNextBuild()) {
+            BatchRunAction records = b.getAction(BatchRunAction.class);
+            for (BatchRun r : records.records) {
+                if (r.taskName.equals(taskName)
+                    && r.timestamp.compareTo(this.timestamp) > 0) // must be newer than this
+                    return r;
             }
         }
         return null;
