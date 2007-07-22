@@ -5,7 +5,7 @@
         <j:choose>
           <j:when test="${run!=null}">
             ${run.timestampString}
-            (<a href="${jobBaseUrl}${job.shortUrl}lastSuccessfulBuild/">#${run.id}</a>)
+            (<a href="${rootURL}/${run.url}/">#${run.id}</a>)
           </j:when>
           <j:otherwise>
             N/A
@@ -35,8 +35,8 @@
           <tr>
             <t:ballColorTd it="${t.iconColor}" />
             <td>${t.name}</td>
-            <local:lastRun run="${t.lastSuccessfulRun}"/>
-            <local:lastRun run="${t.lastFailedRun}"/>
+            <local:lastRun run="${t.lastSuccessfulRun}" href="lastSuccessfulRun"/>
+            <local:lastRun run="${t.lastFailedRun}" href="lastFailedRun"/>
             <td></td>
             <l:isAdmin>
               <td>
