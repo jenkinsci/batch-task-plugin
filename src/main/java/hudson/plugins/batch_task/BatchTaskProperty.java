@@ -31,7 +31,8 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
 
     protected void setOwner(AbstractProject<?, ?> owner) {
         super.setOwner(owner);
-        readResolve(); // set up owners
+        for (BatchTask t : tasks)
+            t.owner = owner;
     }
 
     public List<BatchTask> getTasks() {
@@ -45,12 +46,6 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
 
     public DescriptorImpl getDescriptor() {
         return DESCRIPTOR;
-    }
-
-    protected Object readResolve() {
-        //for (BatchTask t : tasks)
-        //    t.owner = owner;
-        return this;
     }
 
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
