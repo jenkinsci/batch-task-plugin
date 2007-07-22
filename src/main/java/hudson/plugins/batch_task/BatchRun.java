@@ -9,6 +9,7 @@ import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.model.BallColor;
 import hudson.model.AbstractBuild;
+import hudson.model.ModelObject;
 import hudson.tasks.Shell;
 import hudson.util.StreamTaskListener;
 import org.kohsuke.stapler.StaplerRequest;
@@ -27,7 +28,7 @@ import java.util.logging.Logger;
  * 
  * @author Kohsuke Kawaguchi
  */
-public final class BatchRun implements Executable {
+public final class BatchRun implements Executable, ModelObject {
     /**
      * Build result.
      * If null, we are still building.
@@ -129,6 +130,10 @@ public final class BatchRun implements Executable {
             }
         }
         return null;
+    }
+
+    public String getDisplayName() {
+        return taskName+" #"+id;
     }
 
     public void run() {
