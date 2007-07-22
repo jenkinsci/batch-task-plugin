@@ -88,9 +88,11 @@ public final class BatchTask implements Queue.Task {
         for(AbstractBuild<?,?> b : owner.getBuilds()) {
             BatchRunAction bra = b.getAction(BatchRunAction.class);
             if(bra==null)   continue;
-            for(BatchRun br : bra.getRecords())
+            for( int i=bra.records.size()-1; i>=0; i-- ) {
+                BatchRun br = bra.records.get(i);
                 if(br.taskName.equals(name))
                     return br;
+            }
         }
         return null;
     }
