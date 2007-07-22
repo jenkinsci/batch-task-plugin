@@ -15,7 +15,7 @@ import java.util.List;
  * @author Kohsuke Kawaguchi
  */
 public final class BatchRunAction implements Action {
-    protected final AbstractBuild<?,?> owner;
+    public final AbstractBuild<?,?> owner;
     protected final List<BatchRun> records = new ArrayList<BatchRun>();
 
     public BatchRunAction(AbstractBuild<?, ?> owner) {
