@@ -14,6 +14,7 @@ import hudson.tasks.Shell;
 import hudson.util.StreamTaskListener;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.export.Exported;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,6 +49,11 @@ public final class BatchRun implements Executable, ModelObject {
      * @see #getParent()
      */
     public final String taskName;
+
+    /**
+     * Number of milli-seconds it took to run this build.
+     */
+    protected long duration;
 
     protected BatchRun(Calendar timestamp, BatchRunAction parent, int id, BatchTask task) {
         this.timestamp = timestamp;
@@ -166,8 +172,24 @@ public final class BatchRun implements Executable, ModelObject {
         return taskName+" #"+id;
     }
 
+    /**
+     * Gets the string that says how long the build took to run.
+     */
+    public String getDurationString() {
+        return Util.getTimeSpanString(duration);
+    }
+
+    /**
+     * Gets the millisecond it took to build.
+     */
+    @Exported
+    public long getDuration() {
+        return duration;
+    }
+
     public void run() {
         try {
+            long start = System.currentTimeMillis();
             TaskListener listener = new StreamTaskListener(new FileOutputStream(getLogFile()));
             Launcher launcher = Executor.currentExecutor().getOwner().getNode().createLauncher(listener);
 
@@ -184,6 +206,7 @@ public final class BatchRun implements Executable, ModelObject {
                     result = Result.ABORTED;
                 }
             }
+            duration = System.currentTimeMillis()-start;
 
             // save the build result
             parent.owner.save();
