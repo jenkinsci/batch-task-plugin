@@ -35,9 +35,23 @@
           <tr>
             <t:ballColorTd it="${t.iconColor}" />
             <td>${t.name}</td>
-            <local:lastRun run="${t.lastSuccessfulRun}" href="lastSuccessfulRun"/>
-            <local:lastRun run="${t.lastFailedRun}" href="lastFailedRun"/>
-            <td></td>
+            <j:set var="lsr" value="${t.lastSuccessfulRun}" />
+            <j:set var="lfr" value="${t.lastFailedRun}" />
+            <local:lastRun run="${lsr}" href="lastSuccessfulRun"/>
+            <local:lastRun run="${lfr}" href="lastFailedRun"/>
+            <td data="${h.ifThenElse(lsr==null,h.ifThenElse(lfr==null,'0',lfr.duration),lsr.duration)}">
+              <j:choose>
+                <j:when test="${lsr!=null}">
+                  ${lsr.durationString}
+                </j:when>
+                <j:when test="${lfr!=null}">
+                  ${lfr.durationString}
+                </j:when>
+                <j:otherwise>
+                  N/A
+                </j:otherwise>
+              </j:choose>
+            </td>
             <l:isAdmin>
               <td>
                 <form action="${t.name}/execute" method="post">
