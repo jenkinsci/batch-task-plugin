@@ -2,14 +2,14 @@ package hudson.plugins.batch_task;
 
 import hudson.Launcher;
 import hudson.Util;
+import hudson.model.AbstractBuild;
+import hudson.model.BallColor;
 import hudson.model.Executor;
 import hudson.model.LargeText;
+import hudson.model.ModelObject;
 import hudson.model.Queue.Executable;
 import hudson.model.Result;
 import hudson.model.TaskListener;
-import hudson.model.BallColor;
-import hudson.model.AbstractBuild;
-import hudson.model.ModelObject;
 import hudson.tasks.Shell;
 import hudson.util.StreamTaskListener;
 import org.kohsuke.stapler.StaplerRequest;
@@ -126,7 +126,7 @@ public final class BatchRun implements Executable, ModelObject {
         // check siblings
         for( AbstractBuild<?,?> b=parent.owner; b!=null; b=b.getPreviousBuild()) {
             BatchRunAction records = b.getAction(BatchRunAction.class);
-            for(int i=records.records.size(); i>=0; i--) {
+            for(int i=records.records.size()-1; i>=0; i--) {
                 BatchRun r = records.records.get(i);
                 if( r.taskName.equals(taskName)
                  && r.timestamp.compareTo(this.timestamp)<0 ) // must be older than this
@@ -150,6 +150,16 @@ public final class BatchRun implements Executable, ModelObject {
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the URL (under the context root) that points to this record.
+     *
+     * @return
+     *      URL like "job/foo/53/batchTasks/0"
+     */
+    public String getUrl() {
+        return parent.owner.getUrl()+"batchTasks/"+id;
     }
 
     public String getDisplayName() {
