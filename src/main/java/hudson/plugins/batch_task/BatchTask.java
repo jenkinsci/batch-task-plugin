@@ -61,7 +61,13 @@ public final class BatchTask implements Queue.Task {
     }
 
     public long getEstimatedDuration() {
-        return -1;  // TODO: remember past execution records
+        BatchRun b = getLastSuccessfulRun();
+        if(b==null)     return -1;
+
+        long duration = b.getDuration();
+        if(duration==0) return -1;
+
+        return duration;
     }
 
     public Label getAssignedLabel() {
