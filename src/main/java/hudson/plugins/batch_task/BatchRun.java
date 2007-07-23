@@ -228,5 +228,10 @@ public final class BatchRun implements Executable, ModelObject {
         new LargeText(getLogFile(),!isRunning()).doProgressText(req,rsp);
     }
 
+    // used by the executors listing
+    public String toString() {
+        return parent.owner.toString()+'-'+id;
+    }
+
     private static final Logger LOGGER = Logger.getLogger(BatchRun.class.getName());
 }
