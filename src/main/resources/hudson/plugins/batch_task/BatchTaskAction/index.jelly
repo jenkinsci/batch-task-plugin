@@ -5,7 +5,7 @@
         <j:choose>
           <j:when test="${run!=null}">
             ${run.timestampString}
-            (<a href="${rootURL}/${run.url}/">#${run.id}</a>)
+            (<a href="${rootURL}/${run.url}/">${run.buildNumber}</a>)
           </j:when>
           <j:otherwise>
             N/A

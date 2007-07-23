@@ -9,7 +9,7 @@
             <td>
               <img src="${rootURL}/images/32x32/${r.buildStatusUrl}" alt="${r.iconColor.description}" />
             </td><td>
-              <a href="${r.id}/">${r.taskName} (${r.timestampString} ago)</a>
+              <a href="${r.id}/">${r.displayName} (${r.timestampString} ago)</a>
             </td>
           </tr>
         </j:forEach>

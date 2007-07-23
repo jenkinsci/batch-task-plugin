@@ -169,7 +169,11 @@ public final class BatchRun implements Executable, ModelObject {
     }
 
     public String getDisplayName() {
-        return taskName+" #"+id;
+        return taskName+' '+getBuildNumber();
+    }
+
+    public String getBuildNumber() {
+        return "#"+parent.owner.getNumber()+'-'+id;
     }
 
     /**
