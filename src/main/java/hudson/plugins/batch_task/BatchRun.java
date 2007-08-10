@@ -9,7 +9,6 @@ import hudson.model.LargeText;
 import hudson.model.ModelObject;
 import hudson.model.Queue.Executable;
 import hudson.model.Result;
-import hudson.model.TaskListener;
 import hudson.tasks.Shell;
 import hudson.util.StreamTaskListener;
 import org.kohsuke.stapler.StaplerRequest;
@@ -17,7 +16,6 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -192,9 +190,10 @@ public final class BatchRun implements Executable, ModelObject {
     }
 
     public void run() {
+        StreamTaskListener listener=null;
         try {
             long start = System.currentTimeMillis();
-            TaskListener listener = new StreamTaskListener(new FileOutputStream(getLogFile()));
+            listener = new StreamTaskListener(getLogFile());
             Launcher launcher = Executor.currentExecutor().getOwner().getNode().createLauncher(listener);
 
             BatchTask task = getParent();
@@ -217,6 +216,9 @@ public final class BatchRun implements Executable, ModelObject {
         } catch (IOException e) {
             result = Result.FAILURE;
             LOGGER.log(Level.SEVERE, "Failed to write "+getLogFile(),e);
+        } finally {
+            if(listener!=null)
+                listener.close();
         }
     }
 
