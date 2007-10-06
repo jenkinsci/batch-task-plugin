@@ -170,6 +170,10 @@ public final class BatchRun implements Executable, ModelObject {
         return taskName+' '+getBuildNumber();
     }
 
+    public String getNumber() {
+        return parent.owner.getNumber()+"-"+id;
+    }
+
     public String getBuildNumber() {
         return "#"+parent.owner.getNumber()+'-'+id;
     }

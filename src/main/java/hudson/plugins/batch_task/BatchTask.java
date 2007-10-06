@@ -35,10 +35,16 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
 
     /*package*/ transient AbstractProject<?,?> owner;
 
+    /*package*/ transient BatchTaskProperty parent;
+
     @DataBoundConstructor
     public BatchTask(String name, String script) {
         this.name = name;
         this.script = script;
+    }
+
+    public BatchTaskProperty getParent() {
+        return parent;
     }
 
     public String getSearchUrl() {
@@ -46,7 +52,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
     }
 
     public String getDisplayName() {
-        return owner.getDisplayName()+" \u00BB "+name;
+        return name;
     }
 
     public String getFullDisplayName() {

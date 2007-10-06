@@ -34,7 +34,7 @@
         <j:forEach var="t" items="${it.tasks}">
           <tr>
             <t:ballColorTd it="${t.iconColor}" />
-            <td>${t.name}</td>
+            <td><a href="task/${t.name}/">${t.name}</a></td>
             <j:set var="lsr" value="${t.lastSuccessfulRun}" />
             <j:set var="lfr" value="${t.lastFailedRun}" />
             <local:lastRun run="${lsr}" href="lastSuccessfulRun"/>

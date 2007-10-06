@@ -31,8 +31,10 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
 
     protected void setOwner(AbstractProject<?, ?> owner) {
         super.setOwner(owner);
-        for (BatchTask t : tasks)
+        for (BatchTask t : tasks) {
             t.owner = owner;
+            t.parent = this;
+        }
     }
 
     public List<BatchTask> getTasks() {
