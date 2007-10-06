@@ -155,6 +155,6 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         if(!Hudson.adminCheck(req,rsp))
             return;
         Hudson.getInstance().getQueue().add(this,0);
-        rsp.sendRedirect2("..");
+        rsp.forwardToPreviousPage(req);
     }
 }

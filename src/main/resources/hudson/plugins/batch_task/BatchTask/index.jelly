@@ -3,7 +3,7 @@
     <st:include page="sidepanel.jelly" />
     <l:main-panel>
       <h1>${it.displayName}</h1>
-      <t:editableDescription adminOnly="true"/>
+      <!--t:editableDescription adminOnly="true"/-->
 
       <h2>Permalinks</h2>
       <ul>
