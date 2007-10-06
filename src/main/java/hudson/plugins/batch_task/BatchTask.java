@@ -1,15 +1,16 @@
 package hudson.plugins.batch_task;
 
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractModelObject;
 import hudson.model.AbstractProject;
+import hudson.model.BallColor;
 import hudson.model.Hudson;
 import hudson.model.Label;
 import hudson.model.Node;
 import hudson.model.Queue;
-import hudson.model.Result;
-import hudson.model.BallColor;
-import hudson.model.ResourceList;
 import hudson.model.Queue.Executable;
+import hudson.model.ResourceList;
+import hudson.model.Result;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -22,7 +23,7 @@ import java.io.IOException;
  * 
  * @author Kohsuke Kawaguchi
  */
-public final class BatchTask implements Queue.Task {
+public final class BatchTask extends AbstractModelObject implements Queue.Task {
     /**
      * Name of this task. Used for display.
      */
@@ -38,6 +39,10 @@ public final class BatchTask implements Queue.Task {
     public BatchTask(String name, String script) {
         this.name = name;
         this.script = script;
+    }
+
+    public String getSearchUrl() {
+        return name;
     }
 
     public String getDisplayName() {

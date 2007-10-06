@@ -1,0 +1,16 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
+  <l:layout title="${it.displayName}">
+    <st:include page="sidepanel.jelly" />
+    <l:main-panel>
+      <h1>${it.displayName}</h1>
+      <t:editableDescription adminOnly="true"/>
+
+      <h2>Permalinks</h2>
+      <ul>
+        <p:build-permalink property="lastRun"           title="Last run" />
+        <p:build-permalink property="lastSuccessfulRun" title="Last successful run" />
+        <p:build-permalink property="lastFailedRun"     title="Last failed run" />
+      </ul>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>
