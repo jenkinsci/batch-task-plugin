@@ -22,7 +22,6 @@
       <!--st:include page="actions.jelly" /-->
     </l:tasks>
 
-    <!-- TODO: how do we resurrect this without duplicating too much? -->
-    <!--st:include page="buildHistory.jelly" /-->
+    <st:include it="${it.createHistoryWidget()}" page="index.jelly" />
   </l:side-panel>
 </j:jelly>

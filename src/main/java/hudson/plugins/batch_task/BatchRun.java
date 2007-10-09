@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  * 
  * @author Kohsuke Kawaguchi
  */
-public final class BatchRun implements Executable, ModelObject {
+public final class BatchRun implements Executable, ModelObject, Comparable<BatchRun> {
     /**
      * Build result.
      * If null, we are still building.
@@ -237,6 +237,13 @@ public final class BatchRun implements Executable, ModelObject {
     // used by the executors listing
     public String toString() {
         return parent.owner.toString()+'-'+id;
+    }
+
+    /**
+     * Newer records should appear before older records.
+     */
+    public int compareTo(BatchRun that) {
+        return that.timestamp.compareTo(this.timestamp);
     }
 
     private static final Logger LOGGER = Logger.getLogger(BatchRun.class.getName());

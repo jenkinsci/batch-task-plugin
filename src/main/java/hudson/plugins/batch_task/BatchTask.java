@@ -11,12 +11,19 @@ import hudson.model.Queue;
 import hudson.model.Queue.Executable;
 import hudson.model.ResourceList;
 import hudson.model.Result;
+import hudson.util.Iterators;
+import hudson.widgets.BuildHistoryWidget;
+import hudson.widgets.HistoryWidget;
+import hudson.widgets.HistoryWidget.Adapter;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A batch task.
@@ -129,6 +136,27 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         return null;
     }
 
+    /**
+     * Gets all the run records.
+     */
+    public Iterable<BatchRun>  getRuns() {
+        return new Iterable<BatchRun>() {
+            public Iterator<BatchRun> iterator() {
+                return new Iterators.FlattenIterator<BatchRun,AbstractBuild<?,?>>(owner.getBuilds().iterator()) {
+                    protected Iterator<BatchRun> expand(AbstractBuild<?,?> b) {
+                        BatchRunAction a = b.getAction(BatchRunAction.class);
+                        if(a==null) return Iterators.empty();
+                        else        return a.getRecords().iterator();
+                    }
+                };
+            }
+        };
+    }
+
+    public HistoryWidget createHistoryWidget() {
+        return new BuildHistoryWidget<BatchRun>(this,getRuns(),ADAPTER);
+    }
+
     public Executable createExecutable() throws IOException {
         AbstractBuild<?,?> lb = owner.getLastBuild();
         BatchRunAction records = lb.getAction(BatchRunAction.class);
@@ -148,6 +176,18 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         return new ResourceList().w(owner.getWorkspaceResource());
     }
 
+    public Object getDynamic(String token, StaplerRequest req, StaplerResponse rsp) {
+        Matcher m = BUILD_NUMBER_PATTERN.matcher(token);
+        if(m.matches()) {
+            AbstractBuild<?,?> b = owner.getBuildByNumber(Integer.parseInt(m.group(1)));
+            if(b==null)     return null;
+            BatchRunAction a = b.getAction(BatchRunAction.class);
+            if(a==null)     return null;
+            return a.getRecord(Integer.parseInt(m.group(2)));
+        }
+        return null;
+    }
+
     /**
      * Schedules the execution
      */
@@ -157,4 +197,38 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         Hudson.getInstance().getQueue().add(this,0);
         rsp.forwardToPreviousPage(req);
     }
+
+    private static final Adapter<BatchRun> ADAPTER = new Adapter<BatchRun>() {
+        public int compare(BatchRun record, String key) {
+            int[] lhs = parse(record.getNumber());
+            int[] rhs = parse(key);
+
+            int d = lhs[0]-rhs[0];
+            if(d!=0)    return d;
+            return lhs[1]-rhs[1];
+        }
+
+        public String getKey(BatchRun record) {
+            return record.getNumber();
+        }
+
+        public boolean isBuilding(BatchRun record) {
+            return record.isRunning();
+        }
+
+        public String getNextKey(String key) {
+            int[] r = parse(key);
+            r[1]++;
+            return r[0]+"-"+r[1];
+        }
+
+        private int[] parse(String num) {
+            Matcher m = BUILD_NUMBER_PATTERN.matcher(num);
+            if(m.matches())
+                return new int[]{Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)) };
+            return new int[]{0,0};
+        }
+    };
+
+    private static final Pattern BUILD_NUMBER_PATTERN = Pattern.compile("(\\d+)-(\\d+)");
 }
