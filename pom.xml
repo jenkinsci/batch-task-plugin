@@ -8,7 +8,7 @@
   </parent>
   
   <artifactId>batch-task</artifactId>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <packaging>hpi</packaging>
   <name>Hudson batch task plugin</name>
 
@@ -27,8 +27,4 @@
       <scope>provided</scope>
     </dependency>
   </dependencies-->
-
-  <scm>
-    <tag>batch-task-1_0</tag>
-  </scm>
 </project>
