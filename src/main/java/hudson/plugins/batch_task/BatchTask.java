@@ -170,6 +170,23 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
     }
 
     /**
+     * Gets the expected build number assigned to the next run.
+     *
+     * @return string like "5-3"
+     */
+    public String getNextBuildNumber() {
+        AbstractBuild<?,?> lb = owner.getLastBuild();
+        if(lb==null)    return "0-0";
+
+        int id=0;
+        BatchRunAction records = lb.getAction(BatchRunAction.class);
+        if(records!=null)
+            id=records.getRecords().size();
+
+        return lb.getNumber()+"-"+id;
+    }
+
+    /**
      * {@link BatchTask} requires exclusive access to the workspace.
      */
     public ResourceList getResourceList() {
