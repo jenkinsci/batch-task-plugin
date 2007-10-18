@@ -1,0 +1,43 @@
+<!--
+  Displays the execution log
+-->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+  <l:layout title="${it.displayName} Console" norefresh="true">
+    <l:header />
+    <l:side-panel>
+      <l:tasks>
+        <l:task icon="images/24x24/up.gif" href="${h.getNearestAncestorUrl(request,it.owner)}/" title="Back to List" />
+        <l:task icon="images/24x24/terminal.gif" href="${request.originalRequestURI}" title="Console" />
+        <j:set var="p" value="${it.previous}" />
+        <j:if test="${p!=null}">
+          <l:task icon="images/24x24/previous.gif" href="${rootURL}/${p.url}/" title="Previous" />
+        </j:if>
+        <j:set var="n" value="${it.next}" />
+        <j:if test="${n!=null}">
+          <l:task icon="images/24x24/next.gif" href="${rootURL}/${n.url}/" title="Next" />
+        </j:if>
+      </l:tasks>
+    </l:side-panel>
+    <l:main-panel>
+      <h1>
+        <img src="${rootURL}/images/48x48/${it.buildStatusUrl}" width="48" height="48" alt="${it.iconColor.description}" />
+        Console : ${it.taskName}
+      </h1>
+
+      <j:choose>
+        <!-- Do progressive console output -->
+        <j:when test="${it.running}">
+          <pre id="out"></pre>
+          <div id="spinner">
+            <img src="${rootURL}/images/spinner.gif" />
+          </div>
+          <t:progressiveText href="progressiveLog" idref="out" spinner="spinner" />
+        </j:when>
+        <!-- output is completed now. -->
+        <j:otherwise>
+          <pre><st:copyStream file="${it.logFile}"/></pre>
+        </j:otherwise>
+      </j:choose>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

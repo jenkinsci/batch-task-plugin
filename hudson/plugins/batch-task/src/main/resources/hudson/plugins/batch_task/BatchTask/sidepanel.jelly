@@ -1,0 +1,27 @@
+<!--
+  Side panel for the tasks.
+-->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+  <l:header title="${it.name}">
+    <link rel="alternate" title="Hudson:${it.fullDisplayName} (all runs)" href="rssAll" type="application/rss+xml" />
+    <link rel="alternate" title="Hudson:${it.fullDisplayName} (all runs) (RSS 2.0)" href="rssAll?flavor=rss20" type="application/rss+xml" />
+    <link rel="alternate" title="Hudson:${it.fullDisplayName} (failed runs)" href="rssFailed" type="application/rss+xml" />
+    <link rel="alternate" title="Hudson:${it.fullDisplayName} (failed runs) (RSS 2.0)" href="rssFailed?flavor=rss20" type="application/rss+xml" />
+  </l:header>
+  <l:side-panel>
+    <l:tasks>
+      <j:set var="url" value="${h.getNearestAncestorUrl(request,it)}"/>
+      <l:task icon="images/24x24/up.gif" href="../../" title="Back to Task List" />
+      <l:isAdmin>
+        <j:if test="${!it.disabled}">
+          <l:task icon="images/24x24/clock.gif" href="${url}/execute" title="Build Now" />
+        </j:if>
+        <l:task icon="images/24x24/edit-delete.gif" href="${url}/delete" title="Delete Task" />
+        <l:task icon="images/24x24/setting.gif" href="${url}/configure" title="Configure" />
+      </l:isAdmin>
+      <!--st:include page="actions.jelly" /-->
+    </l:tasks>
+
+    <st:include it="${it.createHistoryWidget()}" page="index.jelly" />
+  </l:side-panel>
+</j:jelly>

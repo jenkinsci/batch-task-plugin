@@ -1,0 +1,34 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jvnet.hudson.plugins</groupId>
+    <artifactId>plugin</artifactId>
+    <version>1.146</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  
+  <artifactId>batch-task</artifactId>
+  <version>1.0</version>
+  <packaging>hpi</packaging>
+  <name>Hudson batch task plugin</name>
+
+  <!--dependencies>
+    <dependency>
+      <groupId>org.jvnet.hudson.main</groupId>
+      <artifactId>hudson-war</artifactId>
+      <type>war</type>
+      <version>1.147-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.hudson.main</groupId>
+      <artifactId>hudson-core</artifactId>
+      <version>1.147-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies-->
+
+  <scm>
+    <tag>batch-task-1_0</tag>
+  </scm>
+</project>

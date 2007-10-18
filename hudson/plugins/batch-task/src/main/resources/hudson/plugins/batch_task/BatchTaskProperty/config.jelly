@@ -1,0 +1,24 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <f:optionalBlock name="batch-tasks.on" title="Batch tasks" checked="${!empty(instance.tasks)}"
+      help="/plugin/batch-task/help.html">
+    <f:entry title="Tasks">
+      <f:repeatable var="t" items="${instance.tasks}" noAddButton="true" minimum="1">
+        <table width="100%">
+          <f:entry title="Name" help="/plugin/batch-task/help-name.html">
+            <f:textbox name="batch-task.name" value="${t.name}" />
+          </f:entry>
+          <f:entry title="Script" help="/plugin/batch-task/help-script.html">
+            <textarea class="setting-input" name="batch-task.script"
+              rows="5" style="width:100%">${t.script}</textarea>
+          </f:entry>
+          <f:entry>
+            <div align="right">
+              <input type="button" value="Add another task" class="repeatable-add show-if-last" />
+              <input type="button" value="Delete" class="repeatable-delete show-if-not-only" style="margin-left: 1em;" />
+            </div>
+          </f:entry>
+        </table>
+      </f:repeatable>
+    </f:entry>
+  </f:optionalBlock>
+</j:jelly>
