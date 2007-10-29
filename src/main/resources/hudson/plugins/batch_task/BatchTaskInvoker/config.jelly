@@ -1,7 +1,6 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <f:entry>
     <f:repeatable var="config" items="${instance.configs}" noAddButton="true" minimum="1">
-      ${config}
       <table width="100%">
         <f:entry title="Project">
           <f:textbox name="task.invoker.project" value="${config.project}" onchange="batchTask.updateTaskList(this)" />
