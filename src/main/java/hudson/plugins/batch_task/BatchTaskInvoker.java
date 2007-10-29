@@ -1,11 +1,13 @@
 package hudson.plugins.batch_task;
 
 import hudson.Launcher;
+import hudson.maven.MavenModuleSet;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
+import hudson.model.Project;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import net.sf.json.JSONArray;
@@ -131,17 +133,16 @@ public class BatchTaskInvoker extends Publisher {
         }
 
         public boolean isApplicable(AbstractProject<?,?> item) {
+            // this is unlikely to be useful for standard module types,
+            // so disable from there for now.
+
+            // the real target of this feature is the promoted-builds plugin.
+
+            Object o = item; // avoid javac bug
+
+            if(o instanceof Project || o instanceof MavenModuleSet)
+                return false;
             return true;
-//            // this is unlikely to be useful for standard module types,
-//            // so disable from there for now.
-//
-//            // the real target of this feature is the promoted-builds plugin.
-//
-//            Object o = item; // avoid javac bug
-//
-//            if(o instanceof Project || o instanceof MavenModuleSet)
-//                return false;
-//            return true;
         }
 
         public static final DescriptorImpl INSTANCE = new DescriptorImpl();
