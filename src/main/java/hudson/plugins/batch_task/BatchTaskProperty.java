@@ -5,8 +5,10 @@ import hudson.model.Action;
 import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
+import hudson.util.EditDistance;
 import org.kohsuke.stapler.StaplerRequest;
 
+import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,8 +39,27 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
         }
     }
 
+    public BatchTask getTask(String name) {
+        for (BatchTask t : tasks)
+            if(t.name.equals(name))
+                return t;
+        return null;
+    }
+
     public List<BatchTask> getTasks() {
         return Collections.unmodifiableList(Arrays.asList(tasks));
+    }
+
+    /**
+     * Finds the {@link BatchTask} that has the closest name. Used for error diagnostics.
+     */
+    public BatchTask findNearestTask(String name) {
+        String[] names = new String[tasks.length];
+        for (int i = 0; i < tasks.length; i++)
+            names[i] = tasks[i].name;
+
+        name = EditDistance.findNearest(name,names);
+        return getTask(name);
     }
 
     @Override
