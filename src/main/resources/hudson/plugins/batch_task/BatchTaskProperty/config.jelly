@@ -13,7 +13,7 @@
           </f:entry>
           <f:entry>
             <div align="right">
-              <input type="button" value="Add another task" class="repeatable-add show-if-last" />
+              <input type="button" value="Add another task..." class="repeatable-add show-if-last" />
               <input type="button" value="Delete" class="repeatable-delete show-if-not-only" style="margin-left: 1em;" />
             </div>
           </f:entry>
