@@ -24,11 +24,17 @@
       var batchTask = {
         <!-- Fill the combo box by using the configured project name -->
         updateTaskList : function(e) {
-          var Dom = YAHOO.util.Dom;
-          var tr = Dom.getAncestorByTagName(e,"TR").nextSibling.nextSibling;
-          var combo = tr.getElementsByTagName("SELECT")[0];
+          try {
+            var Dom = YAHOO.util.Dom;
+            var tr = Dom.getAncestorByTagName(e,"TR").nextSibling;
+            while(tr.getAttribute("class")!=null)
+              tr=tr.nextSibling;
+            var combo = tr.getElementsByTagName("SELECT")[0];
 
-          updateListBox(combo,"${rootURL}/plugin/batch-task/getTaskListJson?name="+e.value);
+            updateListBox(combo,"${rootURL}/plugin/batch-task/getTaskListJson?name="+e.value);
+          } catch(e) {
+            alert(e);
+          }
         }
       };
     </script>
