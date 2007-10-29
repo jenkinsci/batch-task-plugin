@@ -1,21 +1,22 @@
 package hudson.plugins.batch_task;
 
 import hudson.Launcher;
-import hudson.maven.MavenModuleSet;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
-import hudson.model.Project;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,6 +39,26 @@ public class BatchTaskInvoker extends Publisher {
 
         public Config(JSONObject source) {
             this(source.getString("project").trim(), source.getString("task").trim());
+        }
+
+        /**
+         * Finds the target {@link BatchTaskProperty}.
+         */
+        public BatchTaskProperty resolveProperty() {
+            AbstractProject<?,?> p = Hudson.getInstance().getItemByFullName(project, AbstractProject.class);
+            if(p==null)     return null;
+            return p.getProperty(BatchTaskProperty.class);
+        }
+
+        /**
+         * Finds the target {@link BatchTask} that this configuration points to,
+         * or null if not found.
+         */
+        public BatchTask resolve() {
+            BatchTaskProperty bp = resolveProperty();
+            if(bp==null)    return null;
+
+            return bp.getTask(this.task);
         }
 
         public boolean invoke(BuildListener listener) {
@@ -81,6 +102,10 @@ public class BatchTaskInvoker extends Publisher {
         this.configs = configs.toArray(new Config[configs.size()]);
     }
 
+    public List<Config> getConfigs() {
+        return Collections.unmodifiableList(Arrays.asList(configs));
+    }
+
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         for (Config config : configs)
             config.invoke(listener);
@@ -98,6 +123,11 @@ public class BatchTaskInvoker extends Publisher {
 
         public String getDisplayName() {
             return "Invoke batch tasks of other projects";
+        }
+
+        @Override
+        public BatchTaskInvoker newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+            return new BatchTaskInvoker(formData);
         }
 
         public boolean isApplicable(AbstractProject<?,?> item) {
