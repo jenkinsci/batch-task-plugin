@@ -83,7 +83,7 @@ public class BatchTaskInvoker extends Publisher {
                 return false;
             }
 
-            logger.println("Invoking "+project+" - "+task);
+            logger.println("Invoking "+project+" - "+this.task+" #"+task.getNextBuildNumber());
             Hudson.getInstance().getQueue().add(task,0);
             return true;
         }
