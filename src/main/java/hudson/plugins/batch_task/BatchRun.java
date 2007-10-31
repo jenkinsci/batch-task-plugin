@@ -147,6 +147,7 @@ public final class BatchRun implements Executable, ModelObject, Comparable<Batch
         // check siblings
         for( AbstractBuild<?,?> b=parent.owner; b!=null; b=b.getNextBuild()) {
             BatchRunAction records = b.getAction(BatchRunAction.class);
+            if(records==null)   continue;
             for (BatchRun r : records.records) {
                 if (r.taskName.equals(taskName)
                     && r.timestamp.compareTo(this.timestamp) > 0) // must be newer than this
