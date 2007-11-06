@@ -134,12 +134,7 @@ public class BatchTaskInvoker extends Publisher {
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {
-            // this is unlikely to be useful for standard module types,
-            // so disable from there for now.
-
-            // the real target of this feature is the promoted-builds plugin.
-
-            return !jobType.isAssignableFrom(Project.class) && !jobType.isAssignableFrom(MavenModuleSet.class); 
+            return true;
         }
 
         public static final DescriptorImpl INSTANCE = new DescriptorImpl();
