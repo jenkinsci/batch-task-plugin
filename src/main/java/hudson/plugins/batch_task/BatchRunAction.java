@@ -40,7 +40,7 @@ public final class BatchRunAction implements Action {
      * Creates and adds a new reocrd.
      */
     protected BatchRun createRecord(BatchTask task) throws IOException {
-        BatchRun r = new BatchRun(new GregorianCalendar(),this,records.size(),task);
+        BatchRun r = new BatchRun(new GregorianCalendar(),this,records.size()+1,task);
         records.add(0,r);
         owner.save();
         return r;
