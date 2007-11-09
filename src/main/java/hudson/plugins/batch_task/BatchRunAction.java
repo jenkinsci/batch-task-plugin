@@ -64,11 +64,9 @@ public final class BatchRunAction implements Action {
             if(r.id==id)   return r; // bingo
         }
 
-        // otherwise search
-        for( int i=0; i<id; i++ ) {
-            BatchRun r = records.get(i);
-            if(r.id==id)   return r;
-        }
+        // otherwise linear search
+        for (BatchRun r : records)
+            if (r.id == id) return r;
 
         return null; // not found
     }
