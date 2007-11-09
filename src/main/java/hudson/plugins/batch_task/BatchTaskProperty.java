@@ -8,11 +8,12 @@ import hudson.model.JobPropertyDescriptor;
 import hudson.util.EditDistance;
 import org.kohsuke.stapler.StaplerRequest;
 
-import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.io.IOException;
 
 /**
  * Batch tasks added as {@link JobProperty}.
@@ -21,7 +22,7 @@ import java.util.List;
  */
 public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
 
-    private final BatchTask[] tasks;
+    private volatile BatchTask[] tasks;
 
     public BatchTaskProperty(BatchTask... tasks) {
         this.tasks = tasks;
@@ -39,6 +40,10 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
         }
     }
 
+    public AbstractProject<?,?> getOwner() {
+        return owner;
+    }
+
     public BatchTask getTask(String name) {
         for (BatchTask t : tasks)
             if(t.name.equals(name))
@@ -48,6 +53,14 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
 
     public List<BatchTask> getTasks() {
         return Collections.unmodifiableList(Arrays.asList(tasks));
+    }
+
+    public synchronized void removeTask(BatchTask t) throws IOException {
+        ArrayList<BatchTask> l = new ArrayList<BatchTask>(Arrays.asList(tasks));
+        if(l.remove(t)) {
+            tasks = l.toArray(new BatchTask[l.size()]);
+            getOwner().save();
+        }
     }
 
     /**
@@ -64,7 +77,7 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
 
     @Override
     public Action getJobAction(AbstractProject<?,?> job) {
-        return new BatchTaskAction(job, getTasks());
+        return new BatchTaskAction(job, this);
     }
 
     public DescriptorImpl getDescriptor() {

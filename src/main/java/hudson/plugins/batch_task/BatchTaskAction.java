@@ -14,20 +14,24 @@ import java.util.List;
  */
 public class BatchTaskAction implements Action {
     public final AbstractProject<?,?> project;
-    public final List<BatchTask> tasks;
+    public final BatchTaskProperty property;
 
-    public BatchTaskAction(AbstractProject<?,?> project, List<BatchTask> tasks) {
+    public BatchTaskAction(AbstractProject<?, ?> project, BatchTaskProperty property) {
         this.project = project;
-        this.tasks = tasks;
+        this.property = property;
+    }
+
+    public List<BatchTask> getTasks() {
+        return property.getTasks();
     }
 
     public String getIconFileName() {
-        if(tasks.isEmpty()) return null;
+        if(property.getTasks().isEmpty()) return null;
         return "gear2.gif";
     }
 
     public String getDisplayName() {
-        if(tasks.size()>1)  return "Tasks";
+        if(property.getTasks().size()>1)  return "Tasks";
         return "Task";
     }
 
@@ -40,10 +44,6 @@ public class BatchTaskAction implements Action {
     }
 
     public BatchTask getTask(String name) {
-        for (BatchTask t : tasks) {
-            if(t.name.equals(name))
-                return t;
-        }
-        return null;
+        return property.getTask(name);
     }
 }

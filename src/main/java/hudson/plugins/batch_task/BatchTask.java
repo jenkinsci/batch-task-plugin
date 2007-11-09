@@ -215,6 +215,16 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         rsp.forwardToPreviousPage(req);
     }
 
+    /**
+     * Deletes this task.
+     */
+    public synchronized void doDoDelete( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
+        if(!Hudson.adminCheck(req,rsp))
+            return;
+        getParent().removeTask(this);
+        rsp.sendRedirect2("../..");
+    }
+
     private static final Adapter<BatchRun> ADAPTER = new Adapter<BatchRun>() {
         public int compare(BatchRun record, String key) {
             int[] lhs = parse(record.getNumber());
