@@ -58,7 +58,7 @@ public final class BatchRunAction implements Action {
      */
     public BatchRun getRecord(int id) {
         // normally this is where it is
-        int idx = records.size()-id -1;
+        int idx = records.size()-id;
         if(idx>=0) {
             BatchRun r = records.get(idx);
             if(r.id==id)   return r; // bingo
