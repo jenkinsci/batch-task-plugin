@@ -9,7 +9,10 @@ import hudson.model.LargeText;
 import hudson.model.ModelObject;
 import hudson.model.Queue.Executable;
 import hudson.model.Result;
+import hudson.model.Hudson;
 import hudson.tasks.Shell;
+import hudson.tasks.BatchFile;
+import hudson.tasks.CommandInterpreter;
 import hudson.util.StreamTaskListener;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -210,7 +213,12 @@ public final class BatchRun implements Executable, ModelObject, Comparable<Batch
                 result = Result.FAILURE;
             } else {
                 try {
-                    result = new Shell(task.script)
+                    CommandInterpreter batchRunner;
+                    if (launcher.isUnix())
+                        batchRunner = new Shell(task.script);
+                    else
+                        batchRunner = new BatchFile(task.script);
+                    result = batchRunner
                         .perform(task.owner.getLastBuild(),launcher,listener) ? Result.SUCCESS : Result.FAILURE;
                 } catch (InterruptedException e) {
                     listener.getLogger().println("ABORTED");
