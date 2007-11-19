@@ -113,8 +113,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         for(AbstractBuild<?,?> b : owner.getBuilds()) {
             BatchRunAction bra = b.getAction(BatchRunAction.class);
             if(bra==null)   continue;
-            for( int i=bra.records.size()-1; i>=0; i-- ) {
-                BatchRun br = bra.records.get(i);
+            for (BatchRun br : bra.records) {
                 if(br.taskName.equals(name))
                     return br;
             }

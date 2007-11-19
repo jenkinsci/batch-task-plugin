@@ -9,10 +9,10 @@ import hudson.model.LargeText;
 import hudson.model.ModelObject;
 import hudson.model.Queue.Executable;
 import hudson.model.Result;
-import hudson.model.Hudson;
-import hudson.tasks.Shell;
 import hudson.tasks.BatchFile;
 import hudson.tasks.CommandInterpreter;
+import hudson.tasks.Shell;
+import hudson.util.Iterators;
 import hudson.util.StreamTaskListener;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -134,8 +134,7 @@ public final class BatchRun implements Executable, ModelObject, Comparable<Batch
         for( AbstractBuild<?,?> b=parent.owner; b!=null; b=b.getPreviousBuild()) {
             BatchRunAction records = b.getAction(BatchRunAction.class);
             if(records==null)   continue;
-            for(int i=records.records.size()-1; i>=0; i--) {
-                BatchRun r = records.records.get(i);
+            for (BatchRun r : records.records) {
                 if( r.taskName.equals(taskName)
                  && r.timestamp.compareTo(this.timestamp)<0 ) // must be older than this
                 return r;
@@ -152,7 +151,7 @@ public final class BatchRun implements Executable, ModelObject, Comparable<Batch
         for( AbstractBuild<?,?> b=parent.owner; b!=null; b=b.getNextBuild()) {
             BatchRunAction records = b.getAction(BatchRunAction.class);
             if(records==null)   continue;
-            for (BatchRun r : records.records) {
+            for (BatchRun r : Iterators.reverse(records.records)) {
                 if (r.taskName.equals(taskName)
                     && r.timestamp.compareTo(this.timestamp) > 0) // must be newer than this
                     return r;
