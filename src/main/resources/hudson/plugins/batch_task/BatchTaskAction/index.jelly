@@ -55,13 +55,14 @@
             <l:isAdmin>
               <td>
                 <form action="${t.name}/execute" method="post">
-                  <input type="image" src="${rootURL}/images/24x24/clock.gif" tooltip="Execute" />
+                  <input type="image" src="${rootURL}/images/${iconSize}/clock.gif" tooltip="Execute" />
                 </form>
               </td>
             </l:isAdmin>
           </tr>
         </j:forEach>
       </table>
+      <t:rssBar-with-iconSize />
     </l:main-panel>
   </l:layout>
 </j:jelly>
