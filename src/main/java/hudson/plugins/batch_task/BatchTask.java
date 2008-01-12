@@ -196,10 +196,15 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
 
     public void checkAbortPermission() {
         // TODO: shall we define our own permission here?
+        // see the hasAbortPermission method below
         // replace to AbstractProject.ABORT after 1.169 release
         getACL().checkPermission(AbstractProject.BUILD);
     }
-    
+
+    public boolean hasAbortPermission() {
+        return getACL().hasPermission(AbstractProject.BUILD);
+    }
+
     /**
      * {@link BatchTask} requires exclusive access to the workspace.
      */
