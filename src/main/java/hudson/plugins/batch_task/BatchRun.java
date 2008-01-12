@@ -9,6 +9,7 @@ import hudson.model.LargeText;
 import hudson.model.ModelObject;
 import hudson.model.Queue.Executable;
 import hudson.model.Result;
+import hudson.model.AbstractProject;
 import hudson.tasks.BatchFile;
 import hudson.tasks.CommandInterpreter;
 import hudson.tasks.Shell;
@@ -235,6 +236,11 @@ public final class BatchRun implements Executable, ModelObject, Comparable<Batch
             if(listener!=null)
                 listener.close();
         }
+    }
+
+    public void checkAbortPermission() {
+        // TODO: shall we define our own permission here?
+        getParent().getACL().checkPermission(AbstractProject.BUILD);
     }
 
 

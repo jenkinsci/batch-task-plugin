@@ -15,6 +15,7 @@ import hudson.util.Iterators;
 import hudson.widgets.BuildHistoryWidget;
 import hudson.widgets.HistoryWidget;
 import hudson.widgets.HistoryWidget.Adapter;
+import hudson.security.ACL;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -183,6 +184,14 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
             id=records.getRecords().size();
 
         return lb.getNumber()+"-"+id;
+    }
+
+    /**
+     * Returns the {@link ACL} for this object.
+     */
+    public ACL getACL() {
+        // TODO: this object should have its own ACL
+        return Hudson.getInstance().getACL();
     }
 
     /**
