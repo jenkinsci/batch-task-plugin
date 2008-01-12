@@ -238,13 +238,6 @@ public final class BatchRun implements Executable, ModelObject, Comparable<Batch
         }
     }
 
-    public void checkAbortPermission() {
-        // TODO: shall we define our own permission here?
-        // replace to AbstractProject.ABORT after 1.169 release
-        getParent().getACL().checkPermission(AbstractProject.BUILD);
-    }
-
-
     /**
      * Handles incremental log output.
      */
