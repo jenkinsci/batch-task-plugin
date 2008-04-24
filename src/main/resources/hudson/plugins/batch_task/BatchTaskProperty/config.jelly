@@ -7,7 +7,7 @@
           <f:entry title="${%Name}" help="/plugin/batch-task/help-name.html">
             <f:textbox name="batch-task.name" value="${t.name}" />
           </f:entry>
-          <f:entry title="Script" help="/plugin/batch-task/help-script.html">
+          <f:entry title="${%Script}" help="/plugin/batch-task/help-script.html">
             <textarea class="setting-input" name="batch-task.script"
               rows="5" style="width:100%">${t.script}</textarea>
           </f:entry>
