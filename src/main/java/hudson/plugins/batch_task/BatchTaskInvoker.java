@@ -68,24 +68,23 @@ public class BatchTaskInvoker extends Publisher {
 
             AbstractProject<?,?> p = Hudson.getInstance().getItemByFullName(project, AbstractProject.class);
             if(p==null) {
-                listener.error("No such project exists: "+project);
+                listener.error(Messages.BatchTaskInvoker_NoSuchProject(project));
                 return false;
             }
 
             BatchTaskProperty bp = p.getProperty(BatchTaskProperty.class);
             if(bp==null) {
-                listener.error("No such task exists: "+task+". In fact, no batch tasks exist at all");
+                listener.error(Messages.BatchTaskInvoker_NoBatchTaskExists(task));
                 return false;
             }
 
             BatchTask task = bp.getTask(this.task);
             if(task==null) {
-                listener.error("No such task exists: "+task+". Perhaps you meant "+
-                    bp.findNearestTask(this.task).name);
+                listener.error(Messages.BatchTaskInvoker_NoSuchTask(task,bp.findNearestTask(this.task).name));
                 return false;
             }
 
-            logger.println("Invoking "+project+" - "+this.task+" #"+task.getNextBuildNumber());
+            logger.println(Messages.BatchTaskInvoker_Invoking(project,this.task,task.getNextBuildNumber()));
             Hudson.getInstance().getQueue().add(task,0);
             return true;
         }
@@ -124,7 +123,7 @@ public class BatchTaskInvoker extends Publisher {
         }
 
         public String getDisplayName() {
-            return "Invoke batch tasks of other projects";
+            return Messages.BatchTaskInvoker_DisplayName();
         }
 
         @Override

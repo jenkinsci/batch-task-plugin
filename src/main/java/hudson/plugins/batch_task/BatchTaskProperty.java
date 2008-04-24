@@ -97,7 +97,7 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
         }
 
         public String getDisplayName() {
-            return "Batch tasks";
+            return Messages.BatchTaskProperty_DisplayName();
         }
 
         public BatchTaskProperty newInstance(StaplerRequest req) throws FormException {
