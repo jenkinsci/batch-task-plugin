@@ -31,8 +31,7 @@ public class BatchTaskAction implements Action {
     }
 
     public String getDisplayName() {
-        if(property.getTasks().size()>1)  return "Tasks";
-        return "Task";
+        return Messages.BatchTaskAction_DisplayName(property.getTasks().size());
     }
 
     public String getUrlName() {

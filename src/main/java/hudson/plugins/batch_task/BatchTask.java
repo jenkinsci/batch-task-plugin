@@ -90,7 +90,9 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
     }
 
     public Label getAssignedLabel() {
-        return owner.getLastBuiltOn().getSelfLabel();
+        Node on = owner.getLastBuiltOn();
+        if(on==null)    return null;
+        return on.getSelfLabel();
     }
 
     public Node getLastBuiltOn() {

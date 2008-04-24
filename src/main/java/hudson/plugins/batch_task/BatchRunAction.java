@@ -29,7 +29,7 @@ public final class BatchRunAction implements Action {
     }
 
     public String getDisplayName() {
-        return "Executed Tasks";
+        return Messages.BatchRunAction_DisplayName();
     }
 
     public String getUrlName() {
