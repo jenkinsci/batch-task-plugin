@@ -1,8 +1,8 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
-  <l:layout title="Executed Tasks : ${it.owner.parent.displayName} ${it.owner.displayName}">
+  <l:layout title="${%title(it.owner.parent.displayName,it.owner.displayName)}">
     <st:include page="sidepanel.jelly" it="${it.owner}" />
     <l:main-panel>
-      <h1>Executed Batch Tasks</h1>
+      <h1>${%Executed Batch Tasks}</h1>
       <table style="margin-top: 1em; margin-left:1em;" class="middle-align">
         <j:forEach var="r" items="${it.records}">
           <tr>

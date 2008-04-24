@@ -5,11 +5,11 @@
       <h1>${it.displayName}</h1>
       <!--t:editableDescription adminOnly="true"/-->
 
-      <h2>Permalinks</h2>
+      <h2>${%Permalinks}</h2>
       <ul>
-        <p:build-permalink property="lastRun"           title="Last run" />
-        <p:build-permalink property="lastSuccessfulRun" title="Last successful run" />
-        <p:build-permalink property="lastFailedRun"     title="Last failed run" />
+        <p:build-permalink property="lastRun"           title="${%Last run}" />
+        <p:build-permalink property="lastSuccessfulRun" title="${%Last successful run}" />
+        <p:build-permalink property="lastFailedRun"     title="${%Last failed run}" />
       </ul>
     </l:main-panel>
   </l:layout>

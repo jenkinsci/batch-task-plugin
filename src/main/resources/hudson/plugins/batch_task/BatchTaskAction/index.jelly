@@ -8,24 +8,24 @@
             (<a href="${rootURL}/${run.url}/">${run.buildNumber}</a>)
           </j:when>
           <j:otherwise>
-            N/A
+            ${%N/A}
           </j:otherwise>
         </j:choose>
       </td>
     </d:tag>
   </d:taglib>
-  <l:layout title="${it.project.displayName} Batch Tasks" xmlns:local="local">
+  <l:layout title="${%title(it.project.displayName)}" xmlns:local="local">
     <st:include page="sidepanel.jelly" it="${it.project}" />
     <l:main-panel>
-      <h1>Batch Tasks</h1>
+      <h1>${%Batch Tasks}</h1>
       <t:setIconSize/>
       <table class="sortable pane" id="projectstatus">
         <tr>
-          <th>S</th>
-          <th initialSortDir="down">Task</th>
-          <th>Last Success</th>
-          <th>Last Failure</th>
-          <th>Last Duration</th>
+          <th>${%S}</th>
+          <th initialSortDir="down">${%Task}</th>
+          <th>${%Last Success}</th>
+          <th>${%Last Failure}</th>
+          <th>${%Last Duration}</th>
           <th><st:nbsp/></th>
           <l:isAdmin><!-- build icon -->
             <th width="1"><st:nbsp/></th>
@@ -48,14 +48,14 @@
                   ${lfr.durationString}
                 </j:when>
                 <j:otherwise>
-                  N/A
+                  ${%N/A}
                 </j:otherwise>
               </j:choose>
             </td>
             <l:isAdmin>
               <td>
                 <form action="${t.name}/execute" method="post">
-                  <input type="image" src="${rootURL}/images/${iconSize}/clock.gif" tooltip="Execute" />
+                  <input type="image" src="${rootURL}/images/${iconSize}/clock.gif" tooltip="${%Execute}" />
                 </form>
               </td>
             </l:isAdmin>

@@ -2,10 +2,10 @@
   <f:entry>
     <f:repeatable var="config" items="${instance.configs}" noAddButton="true" minimum="1">
       <table width="100%">
-        <f:entry title="Project">
+        <f:entry title="${%Project}">
           <f:textbox name="task.invoker.project" value="${config.project}" onchange="batchTask.updateTaskList(this)" />
         </f:entry>
-        <f:entry title="Task">
+        <f:entry title="${%Task}">
           <select class="setting-input" name="task.invoker.task">
             <j:forEach var="task" items="${config.resolveProperty().tasks}">
               <f:option selected="${task.name==config.task}">${task.name}</f:option>
@@ -14,8 +14,8 @@
         </f:entry>
         <f:entry>
           <div align="right">
-            <input type="button" value="Add another task..." class="repeatable-add show-if-last" />
-            <input type="button" value="Delete" class="repeatable-delete show-if-not-only" style="margin-left: 1em;" />
+            <input type="button" value="${%Add another task...}" class="repeatable-add show-if-last" />
+            <input type="button" value="${%Delete}" class="repeatable-delete show-if-not-only" style="margin-left: 1em;" />
           </div>
         </f:entry>
       </table>
