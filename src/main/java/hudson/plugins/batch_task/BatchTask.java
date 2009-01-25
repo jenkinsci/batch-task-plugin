@@ -200,11 +200,11 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         // TODO: shall we define our own permission here?
         // see the hasAbortPermission method below
         // replace to AbstractProject.ABORT after 1.169 release
-        getACL().checkPermission(AbstractProject.BUILD);
+        getACL().checkPermission(AbstractProject.ABORT);
     }
 
     public boolean hasAbortPermission() {
-        return getACL().hasPermission(AbstractProject.BUILD);
+        return getACL().hasPermission(AbstractProject.ABORT);
     }
 
     /**
@@ -279,4 +279,16 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
     };
 
     private static final Pattern BUILD_NUMBER_PATTERN = Pattern.compile("(\\d+)-(\\d+)");
+
+	public void doCancelQueue(StaplerRequest req, StaplerResponse rsp)
+			throws IOException, ServletException {
+        checkAbortPermission();
+
+        Hudson.getInstance().getQueue().cancel(this);
+        rsp.forwardToPreviousPage(req);
+	}
+
+	public String getUrl() {
+    	return owner.getUrl() + "/batchTasks/task/" + name + "/";
+	}
 }
