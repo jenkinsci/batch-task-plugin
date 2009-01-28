@@ -11,6 +11,7 @@ import hudson.model.Queue;
 import hudson.model.Queue.Executable;
 import hudson.model.ResourceList;
 import hudson.model.Result;
+import hudson.model.Job;
 import hudson.util.Iterators;
 import hudson.widgets.BuildHistoryWidget;
 import hudson.widgets.HistoryWidget;
@@ -23,8 +24,11 @@ import org.kohsuke.stapler.StaplerResponse;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 
 /**
  * A batch task.
@@ -291,4 +295,33 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
 	public String getUrl() {
     	return owner.getUrl() + "/batchTasks/task/" + name + "/";
 	}
+
+    static {
+        Queue.XSTREAM.registerConverter(new AbstractSingleValueConverter() {
+
+			@Override
+			public boolean canConvert(Class klazz) {
+				return BatchTask.class==klazz;
+			}
+
+			@Override
+			public Object fromString(String str) {
+                int idx=str.lastIndexOf('/');
+                if(idx<0)   throw new NoSuchElementException("Illegal format: "+str);
+
+                String projectName = str.substring(0, idx);
+                Job<?,?> job = (Job<?,?>) Hudson.getInstance().getItemByFullName(projectName);
+                if(job==null)  throw new NoSuchElementException("No such job exists: "+projectName);
+                BatchTaskProperty bp = job.getProperty(BatchTaskProperty.class);
+                if(bp==null)  throw new NoSuchElementException(projectName+" doesn't have the batck task anymore");
+                return bp.getTask(str.substring(idx+1));                
+			}
+
+			@Override
+			public String toString(Object item) {
+                BatchTask bt = (BatchTask) item;
+                return bt.owner.getFullName()+"/"+bt.name;
+			}
+        });
+    }
 }
