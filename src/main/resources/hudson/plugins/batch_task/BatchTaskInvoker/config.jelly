@@ -8,7 +8,7 @@
         <f:entry title="${%Task}">
           <select class="setting-input" name="task.invoker.task">
             <j:forEach var="task" items="${config.resolveProperty().tasks}">
-              <f:option selected="${task.name==config.task}">${task.name}</f:option>
+              <f:option selected="${task.name==config.task}" value="${task.name}">${task.name}</f:option>
             </j:forEach>
           </select>
         </f:entry>
