@@ -27,9 +27,7 @@
           <th>${%Last Failure}</th>
           <th>${%Last Duration}</th>
           <th><st:nbsp/></th>
-          <l:isAdmin><!-- build icon -->
-            <th width="1"><st:nbsp/></th>
-          </l:isAdmin>
+          <th width="1"><st:nbsp/></th><!-- build icon -->
         </tr>
         <j:forEach var="t" items="${it.tasks}">
           <tr>
@@ -52,13 +50,13 @@
                 </j:otherwise>
               </j:choose>
             </td>
-            <l:isAdmin>
-              <td>
+            <td>
+              <j:if test="${t.hasBuildPermission()}">
                 <form action="${t.name}/execute" method="post">
                   <input type="image" src="${rootURL}/images/${iconSize}/clock.gif" tooltip="${%Execute}" />
                 </form>
-              </td>
-            </l:isAdmin>
+              </j:if>
+            </td>
           </tr>
         </j:forEach>
       </table>

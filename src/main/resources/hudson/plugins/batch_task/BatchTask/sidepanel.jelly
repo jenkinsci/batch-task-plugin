@@ -12,13 +12,18 @@
     <l:tasks>
       <j:set var="url" value="${h.getNearestAncestorUrl(request,it)}"/>
       <l:task icon="images/24x24/up.gif" href="../../" title="${%Back to Task List}" />
-      <l:isAdmin>
+      <j:if test="${it.hasBuildPermission()}">
         <j:if test="${!it.disabled}">
           <l:task icon="images/24x24/clock.gif" href="${url}/execute" title="${%Build Now}" />
         </j:if>
+      </j:if>
+      <j:if test="${it.hasDeletePermission()}">
         <l:task icon="images/24x24/edit-delete.gif" href="${url}/delete" title="${%Delete Task}" />
+      </j:if>
+      <!-- Configure doesn't seem to lead anywhere -->
+      <!--j:if test="${it.hasConfigurePermission()}">
         <l:task icon="images/24x24/setting.gif" href="${url}/configure" title="${%Configure}" />
-      </l:isAdmin>
+      </j:if-->
       <!--st:include page="actions.jelly" /-->
     </l:tasks>
 

@@ -197,7 +197,8 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
      */
     public ACL getACL() {
         // TODO: this object should have its own ACL
-        return Hudson.getInstance().getACL();
+        //return Hudson.getInstance().getACL();
+    	return owner.getACL();
     }
 
     public void checkAbortPermission() {
@@ -209,6 +210,18 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
 
     public boolean hasAbortPermission() {
         return getACL().hasPermission(AbstractProject.ABORT);
+    }
+    
+    public boolean hasBuildPermission() {
+    	return getACL().hasPermission(AbstractProject.BUILD);
+    }
+    
+    public boolean hasDeletePermission() {
+    	return getACL().hasPermission(AbstractProject.DELETE);
+    }
+    
+    public boolean hasConfigurePermission() {
+    	return getACL().hasPermission(AbstractProject.CONFIGURE);
     }
 
     /**
@@ -234,8 +247,8 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
      * Schedules the execution
      */
     public synchronized void doExecute( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
-        if(!Hudson.adminCheck(req,rsp))
-            return;
+        getACL().checkPermission(AbstractProject.BUILD);
+        
         Hudson.getInstance().getQueue().add(this,0);
         rsp.forwardToPreviousPage(req);
     }
@@ -244,8 +257,8 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
      * Deletes this task.
      */
     public synchronized void doDoDelete( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
-        if(!Hudson.adminCheck(req,rsp))
-            return;
+        getACL().checkPermission(AbstractProject.DELETE);
+        
         getParent().removeTask(this);
         rsp.sendRedirect2("../..");
     }
