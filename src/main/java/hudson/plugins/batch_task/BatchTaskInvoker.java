@@ -1,7 +1,6 @@
 package hudson.plugins.batch_task;
 
 import hudson.Launcher;
-import hudson.maven.MavenModuleSet;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
