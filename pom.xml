@@ -8,14 +8,8 @@
   </parent>
   
   <artifactId>batch-task</artifactId>
-  <version>1.7</version>
+  <version>1.8-SNAPSHOT</version>
   <packaging>hpi</packaging>
   <name>Hudson batch task plugin</name>
   <url>http://hudson.gotdns.com/wiki/display/HUDSON/Batch+Task+Plugin</url>
-
-  <scm>
-    <connection>scm:svn:https://guest@svn.dev.java.net/svn/hudson/tags/batch-task-1.7</connection>
-    <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/tags/batch-task-1.7</developerConnection>
-    <url>https://hudson.dev.java.net/source/browse/hudson/hudson/plugins/batch-task/tags/batch-task-1.7</url>
-  </scm>
 </project>
