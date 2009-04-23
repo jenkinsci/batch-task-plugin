@@ -11,5 +11,5 @@
   <version>1.8-SNAPSHOT</version>
   <packaging>hpi</packaging>
   <name>Hudson batch task plugin</name>
-  <url>http://hudson.gotdns.com/wiki/display/HUDSON/Batch+Task+Plugin</url>
+  <url>http://wiki.hudson-ci.org/display/HUDSON/Batch+Task+Plugin</url>
 </project>
