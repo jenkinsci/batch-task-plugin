@@ -9,6 +9,7 @@ import hudson.model.Hudson;
 import hudson.model.Project;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
+import hudson.tasks.BuildStepMonitor;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
@@ -110,6 +111,10 @@ public class BatchTaskInvoker extends Publisher {
         for (Config config : configs)
             config.invoke(listener);
         return true;
+    }
+
+    public BuildStepMonitor getRequiredMonitorService() {
+        return BuildStepMonitor.NONE;
     }
 
     public Descriptor<Publisher> getDescriptor() {
