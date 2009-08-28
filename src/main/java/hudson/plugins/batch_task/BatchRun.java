@@ -2,6 +2,7 @@ package hudson.plugins.batch_task;
 
 import hudson.Launcher;
 import hudson.Util;
+import hudson.AbortException;
 import hudson.model.AbstractBuild;
 import hudson.model.BallColor;
 import hudson.model.Executor;
@@ -208,33 +209,38 @@ public final class BatchRun implements Executable, ModelObject, Comparable<Batch
             Launcher launcher = Executor.currentExecutor().getOwner().getNode().createLauncher(listener);
 
             BatchTask task = getParent();
-            if(task==null) {
-                listener.getLogger().println("ERROR: undefined taask \""+taskName+"\"");
-                result = Result.FAILURE;
-            } else {
-                try {
-                    CommandInterpreter batchRunner;
-                    if (launcher.isUnix())
-                        batchRunner = new Shell(task.script);
-                    else
-                        batchRunner = new BatchFile(task.script);
-                    result = batchRunner
-                        .perform(task.owner.getLastBuild(),launcher,listener) ? Result.SUCCESS : Result.FAILURE;
-                } catch (InterruptedException e) {
-                    listener.getLogger().println("ABORTED");
-                    result = Result.ABORTED;
-                }
+            if(task==null)
+                throw new AbortException("ERROR: undefined taask \""+taskName+"\"");
+
+            try {
+                CommandInterpreter batchRunner;
+                if (launcher.isUnix())
+                    batchRunner = new Shell(task.script);
+                else
+                    batchRunner = new BatchFile(task.script);
+                AbstractBuild<?,?> lb = task.owner.getLastBuild();
+                if (lb.getWorkspace()==null)
+                    throw new AbortException(lb.getFullDisplayName()+" doesn't have a workspace.");
+                result = batchRunner.perform(lb,launcher,listener) ? Result.SUCCESS : Result.FAILURE;
+            } catch (InterruptedException e) {
+                listener.getLogger().println("ABORTED");
+                result = Result.ABORTED;
             }
             duration = System.currentTimeMillis()-start;
 
             // save the build result
             parent.owner.save();
+        } catch (AbortException e) {
+            result = Result.FAILURE;
+            listener.error(e.getMessage());
         } catch (IOException e) {
             result = Result.FAILURE;
             LOGGER.log(Level.SEVERE, "Failed to write "+getLogFile(),e);
         } finally {
             if(listener!=null)
                 listener.close();
+            if (result==null)
+                result = Result.FAILURE;
         }
     }
 
