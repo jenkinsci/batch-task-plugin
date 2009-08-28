@@ -163,7 +163,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         return new BuildHistoryWidget<BatchRun>(this,getRuns(),ADAPTER);
     }
 
-    public Executable createExecutable() throws IOException {
+    public BatchRun createExecutable() throws IOException {
         AbstractBuild<?,?> lb = owner.getLastBuild();
         BatchRunAction records = lb.getAction(BatchRunAction.class);
         if(records==null) {
@@ -256,7 +256,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
     /**
      * Deletes this task.
      */
-    public synchronized void doDoDelete( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
+    public synchronized void doDoDelete(StaplerResponse rsp) throws IOException, ServletException {
         getACL().checkPermission(AbstractProject.DELETE);
         
         getParent().removeTask(this);
