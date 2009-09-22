@@ -6,7 +6,6 @@ import hudson.AbortException;
 import hudson.model.AbstractBuild;
 import hudson.model.BallColor;
 import hudson.model.Executor;
-import hudson.model.LargeText;
 import hudson.model.ModelObject;
 import hudson.model.Queue.Executable;
 import hudson.model.Result;
@@ -19,6 +18,7 @@ import hudson.util.StreamTaskListener;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
+import org.kohsuke.stapler.framework.io.LargeText;
 
 import java.io.File;
 import java.io.IOException;
@@ -252,7 +252,7 @@ public final class BatchRun implements Executable, ModelObject, Comparable<Batch
     }
 
     // used by the executors listing
-    public String toString() {
+    @Override public String toString() {
         return parent.owner.toString()+'-'+id;
     }
 

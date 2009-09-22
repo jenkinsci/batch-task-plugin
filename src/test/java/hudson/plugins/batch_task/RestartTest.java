@@ -24,7 +24,7 @@ public class RestartTest extends HudsonTestCase {
         
         // schedule a build but make sure it stays in the queue
         Queue q = hudson.getQueue();
-        q.add(t,9999);
+        q.schedule(t,9999);
         // reload the queue and make sure it persists fine
         q.save();
         q.clear();

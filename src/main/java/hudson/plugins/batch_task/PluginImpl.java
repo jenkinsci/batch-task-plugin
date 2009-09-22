@@ -3,8 +3,6 @@ package hudson.plugins.batch_task;
 import hudson.Plugin;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
-import hudson.model.Jobs;
-import hudson.tasks.BuildStep;
 import hudson.util.ListBoxModel;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -20,12 +18,6 @@ import java.io.IOException;
  * @plugin
  */
 public class PluginImpl extends Plugin {
-    @Override
-    public void start() throws Exception {
-        Jobs.PROPERTIES.add(BatchTaskProperty.DESCRIPTOR);
-        BuildStep.PUBLISHERS.addNotifier(BatchTaskInvoker.DescriptorImpl.INSTANCE);
-    }
-
     public void doGetTaskListJson(StaplerRequest req, StaplerResponse rsp,@QueryParameter("name") String name) throws IOException, ServletException {
         // when the item is not found, the user should be getting an error from elsewhere.
         ListBoxModel r = new ListBoxModel();

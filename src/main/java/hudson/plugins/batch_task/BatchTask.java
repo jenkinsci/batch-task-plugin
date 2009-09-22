@@ -8,7 +8,6 @@ import hudson.model.Hudson;
 import hudson.model.Label;
 import hudson.model.Node;
 import hudson.model.Queue;
-import hudson.model.Queue.Executable;
 import hudson.model.ResourceList;
 import hudson.model.Result;
 import hudson.model.Job;
@@ -249,7 +248,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
     public synchronized void doExecute( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
         getACL().checkPermission(AbstractProject.BUILD);
         
-        Hudson.getInstance().getQueue().add(this,0);
+        Hudson.getInstance().getQueue().schedule(this,0);
         rsp.forwardToPreviousPage(req);
     }
 

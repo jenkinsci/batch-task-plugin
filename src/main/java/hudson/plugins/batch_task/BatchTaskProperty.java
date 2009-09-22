@@ -1,5 +1,6 @@
 package hudson.plugins.batch_task;
 
+import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Job;
@@ -84,6 +85,7 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
         return DESCRIPTOR;
     }
 
+    @Extension
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
     public static final class DescriptorImpl extends JobPropertyDescriptor {

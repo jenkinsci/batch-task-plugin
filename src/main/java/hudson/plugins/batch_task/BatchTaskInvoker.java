@@ -1,15 +1,15 @@
 package hudson.plugins.batch_task;
 
+import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
-import hudson.model.Descriptor;
 import hudson.model.Hudson;
-import hudson.model.Project;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.tasks.BuildStepMonitor;
+import hudson.tasks.Notifier;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author Kohsuke Kawaguchi
  */
-public class BatchTaskInvoker extends Publisher {
+public class BatchTaskInvoker extends Notifier {
     /**
      * What task to invoke?
      */
@@ -85,7 +85,7 @@ public class BatchTaskInvoker extends Publisher {
             }
 
             logger.println(Messages.BatchTaskInvoker_Invoking(project,this.task,task.getNextBuildNumber()));
-            Hudson.getInstance().getQueue().add(task,0);
+            Hudson.getInstance().getQueue().schedule(task,0);
             return true;
         }
     }
@@ -117,7 +117,8 @@ public class BatchTaskInvoker extends Publisher {
         return BuildStepMonitor.NONE;
     }
 
-    public Descriptor<Publisher> getDescriptor() {
+    @Override
+    public BuildStepDescriptor<Publisher> getDescriptor() {
         return DescriptorImpl.INSTANCE;
     }
 
@@ -140,6 +141,7 @@ public class BatchTaskInvoker extends Publisher {
             return true;
         }
 
+        @Extension
         public static final DescriptorImpl INSTANCE = new DescriptorImpl();
     }
 }
