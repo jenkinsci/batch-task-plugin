@@ -2,7 +2,7 @@
   Side panel for the tasks.
 -->
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-  <l:header title="${it.name}">
+  <l:header>
     <link rel="alternate" title="Hudson:${it.fullDisplayName} (all runs)" href="rssAll" type="application/rss+xml" />
     <link rel="alternate" title="Hudson:${it.fullDisplayName} (all runs) (RSS 2.0)" href="rssAll?flavor=rss20" type="application/rss+xml" />
     <link rel="alternate" title="Hudson:${it.fullDisplayName} (failed runs)" href="rssFailed" type="application/rss+xml" />
