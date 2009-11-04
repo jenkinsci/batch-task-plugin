@@ -7,6 +7,7 @@ import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
 import hudson.util.EditDistance;
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
         this((BatchTask[])tasks.toArray(new BatchTask[tasks.size()]));
     }
 
+    @Override
     protected void setOwner(AbstractProject<?, ?> owner) {
         super.setOwner(owner);
         for (BatchTask t : tasks) {
@@ -81,6 +83,7 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
         return new BatchTaskAction(job, this);
     }
 
+    @Override
     public DescriptorImpl getDescriptor() {
         return DESCRIPTOR;
     }
@@ -94,6 +97,7 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
             load();
         }
 
+        @Override
         public boolean isApplicable(Class<? extends Job> jobType) {
             return AbstractProject.class.isAssignableFrom(jobType);
         }
@@ -102,7 +106,8 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
             return Messages.BatchTaskProperty_DisplayName();
         }
 
-        public BatchTaskProperty newInstance(StaplerRequest req) throws FormException {
+        @Override
+        public BatchTaskProperty newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             if(req.getParameter("batch-tasks.on")!=null)
                 return new BatchTaskProperty(req.bindParametersToList(BatchTask.class, "batch-task."));
             else
