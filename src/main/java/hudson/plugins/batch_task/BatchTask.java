@@ -11,6 +11,7 @@ import hudson.model.Queue;
 import hudson.model.ResourceList;
 import hudson.model.Result;
 import hudson.model.Job;
+import hudson.model.queue.CauseOfBlockage;
 import hudson.util.Iterators;
 import hudson.widgets.BuildHistoryWidget;
 import hudson.widgets.HistoryWidget;
@@ -74,8 +75,13 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         return owner.isBuildBlocked();
     }
 
+    // Deprecated.. leave in for a while to support Hudson < 1.330
     public String getWhyBlocked() {
         return owner.getWhyBlocked();
+    }
+
+    public CauseOfBlockage getCauseOfBlockage() {
+        return owner.getCauseOfBlockage();
     }
 
     public String getName() {
@@ -144,14 +150,14 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
     /**
      * Gets all the run records.
      */
-    public Iterable<BatchRun>  getRuns() {
+    public Iterable<BatchRun> getRuns() {
         return new Iterable<BatchRun>() {
             public Iterator<BatchRun> iterator() {
                 return new Iterators.FlattenIterator<BatchRun,AbstractBuild<?,?>>(owner.getBuilds().iterator()) {
                     protected Iterator<BatchRun> expand(AbstractBuild<?,?> b) {
                         BatchRunAction a = b.getAction(BatchRunAction.class);
                         if(a==null) return Iterators.empty();
-                        else        return a.getRecords().iterator();
+                        else        return a.getRecords(name).iterator();
                     }
                 };
             }
@@ -164,6 +170,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
 
     public BatchRun createExecutable() throws IOException {
         AbstractBuild<?,?> lb = owner.getLastBuild();
+        if (lb == null) return null;
         BatchRunAction records = lb.getAction(BatchRunAction.class);
         if(records==null) {
             records = new BatchRunAction(lb);
@@ -195,15 +202,10 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
      * Returns the {@link ACL} for this object.
      */
     public ACL getACL() {
-        // TODO: this object should have its own ACL
-        //return Hudson.getInstance().getACL();
     	return owner.getACL();
     }
 
     public void checkAbortPermission() {
-        // TODO: shall we define our own permission here?
-        // see the hasAbortPermission method below
-        // replace to AbstractProject.ABORT after 1.169 release
         getACL().checkPermission(AbstractProject.ABORT);
     }
 
@@ -309,15 +311,16 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
 	}
 
     static {
+        // Used when BatchTask is in Queue at Hudson shutdown
         Queue.XSTREAM.registerConverter(new AbstractSingleValueConverter() {
 
-			@Override
-			public boolean canConvert(Class klazz) {
-				return BatchTask.class==klazz;
-			}
+            @Override
+            public boolean canConvert(Class klazz) {
+                return BatchTask.class==klazz;
+            }
 
-			@Override
-			public Object fromString(String str) {
+            @Override
+            public Object fromString(String str) {
                 int idx=str.lastIndexOf('/');
                 if(idx<0)   throw new NoSuchElementException("Illegal format: "+str);
 
@@ -327,13 +330,13 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
                 BatchTaskProperty bp = job.getProperty(BatchTaskProperty.class);
                 if(bp==null)  throw new NoSuchElementException(projectName+" doesn't have the batck task anymore");
                 return bp.getTask(str.substring(idx+1));                
-			}
+            }
 
-			@Override
-			public String toString(Object item) {
+            @Override
+            public String toString(Object item) {
                 BatchTask bt = (BatchTask) item;
                 return bt.owner.getFullName()+"/"+bt.name;
-			}
+            }
         });
     }
 }

@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.321</version>
+    <version>1.330</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   
@@ -12,4 +12,15 @@
   <packaging>hpi</packaging>
   <name>Hudson batch task plugin</name>
   <url>http://wiki.hudson-ci.org/display/HUDSON/Batch+Task+Plugin</url>
+
+  <developers>
+    <developer>
+      <id>kohsuke</id>
+      <name>Kohsuke Kawaguchi</name>
+    </developer>
+    <developer>
+      <id>mindless</id>
+      <name>Alan Harder</name>
+    </developer>
+  </developers>
 </project>

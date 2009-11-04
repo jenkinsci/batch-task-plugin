@@ -7,6 +7,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
@@ -51,6 +52,18 @@ public final class BatchRunAction implements Action {
      */
     public List<BatchRun> getRecords() {
         return Collections.unmodifiableList(records);
+    }
+
+    /**
+     * Get run records for a particular task.
+     * @param taskName Get runs for this task
+     */
+    public List<BatchRun> getRecords(String taskName) {
+        List<BatchRun> result = new ArrayList<BatchRun>(records.size());
+        for (BatchRun r : records) {
+            if (r.taskName.equals(taskName)) result.add(r);
+        }
+        return result;
     }
 
     /**
