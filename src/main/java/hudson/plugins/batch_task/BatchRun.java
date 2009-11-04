@@ -9,7 +9,6 @@ import hudson.model.Executor;
 import hudson.model.ModelObject;
 import hudson.model.Queue.Executable;
 import hudson.model.Result;
-import hudson.model.AbstractProject;
 import hudson.tasks.BatchFile;
 import hudson.tasks.CommandInterpreter;
 import hudson.tasks.Shell;
@@ -83,8 +82,8 @@ public final class BatchRun implements Executable, ModelObject, Comparable<Batch
      *      string like "3 minutes" "1 day" etc.
      */
     public String getTimestampString() {
-        long duration = new GregorianCalendar().getTimeInMillis()-timestamp.getTimeInMillis();
-        return Util.getTimeSpanString(duration);
+        long time = new GregorianCalendar().getTimeInMillis()-timestamp.getTimeInMillis();
+        return Util.getTimeSpanString(time);
     }
 
     /**
@@ -125,7 +124,7 @@ public final class BatchRun implements Executable, ModelObject, Comparable<Batch
     }
 
     public String getBuildStatusUrl() {
-        return getIconColor()+".gif";
+        return getIconColor().getImage();
     }
 
     /**
