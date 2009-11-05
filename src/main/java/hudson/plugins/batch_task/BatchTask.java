@@ -190,10 +190,10 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         AbstractBuild<?,?> lb = owner.getLastBuild();
         if(lb==null)    return "0-0";
 
-        int id=0;
+        int id=1;
         BatchRunAction records = lb.getAction(BatchRunAction.class);
         if(records!=null)
-            id=records.getRecords().size();
+            id=records.getRecords().size()+1;
 
         return lb.getNumber()+"-"+id;
     }
