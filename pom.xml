@@ -8,7 +8,7 @@
   </parent>
   
   <artifactId>batch-task</artifactId>
-  <version>1.9</version>
+  <version>1.10-SNAPSHOT</version>
   <packaging>hpi</packaging>
   <name>Hudson batch task plugin</name>
   <url>http://wiki.hudson-ci.org/display/HUDSON/Batch+Task+Plugin</url>
@@ -23,10 +23,4 @@
       <name>Alan Harder</name>
     </developer>
   </developers>
-
-  <scm>
-    <connection>scm:svn:https://guest@svn.dev.java.net/svn/hudson/tags/batch-task-1.9</connection>
-    <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/tags/batch-task-1.9</developerConnection>
-    <url>https://hudson.dev.java.net/source/browse/hudson/tags/batch-task-1.9</url>
-  </scm>
 </project>
