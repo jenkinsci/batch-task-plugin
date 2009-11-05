@@ -6,6 +6,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Hudson;
+import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.tasks.BuildStepMonitor;
@@ -91,25 +92,40 @@ public class BatchTaskInvoker extends Notifier {
     }
 
     private final Config[] configs;
+    private /*almost final*/ Result threshold;
 
-    public BatchTaskInvoker(Config[] configs) {
+    private Object readResolve() {
+        if (threshold==null) threshold = Result.UNSTABLE;
+        return this;
+    }
+
+    public BatchTaskInvoker(Config[] configs, Result threshold) {
         this.configs = configs;
+        this.threshold = threshold;
     }
 
     public BatchTaskInvoker(JSONObject source) {
-        List<Config> configs = new ArrayList<Config>();
+        List<Config> configList = new ArrayList<Config>();
         for( Object o : JSONArray.fromObject(source.get("config")) )
-            configs.add(new Config((JSONObject)o));
-        this.configs = configs.toArray(new Config[configs.size()]);
+            configList.add(new Config((JSONObject)o));
+        this.configs = configList.toArray(new Config[configList.size()]);
+        this.threshold = source.getBoolean("evenIfUnstable") ? Result.UNSTABLE : Result.SUCCESS;
     }
 
     public List<Config> getConfigs() {
         return Collections.unmodifiableList(Arrays.asList(configs));
     }
 
+    public Result getThreshold() {
+        return threshold;
+    }
+
+    @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        for (Config config : configs)
-            config.invoke(listener);
+        if (build.getResult().isBetterOrEqualTo(threshold)) {
+            for (Config config : configs)
+                config.invoke(listener);
+        }
         return true;
     }
 

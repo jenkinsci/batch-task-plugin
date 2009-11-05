@@ -20,7 +20,7 @@
         </f:entry>
       </table>
     </f:repeatable>
-    <script>
+    <script>// &lt;![CDATA[
       var batchTask = {
         <!-- Fill the combo box by using the configured project name -->
         updateTaskList : function(e) {
@@ -31,12 +31,18 @@
               tr=tr.nextSibling;
             var combo = tr.getElementsByTagName("SELECT")[0];
 
-            updateListBox(combo,"${rootURL}/plugin/batch-task/getTaskListJson?name="+e.value);
+            updateListBox(combo,"${rootURL}/plugin/batch-task/getTaskListJson?name="+encodeURIComponent(e.value));
           } catch(e) {
             alert(e);
           }
         }
       };
+    // ]]&gt;
     </script>
+    <f:entry title="">
+      <f:checkbox id="task.evenIfUnstable" name="task.evenIfUnstable"
+       checked="${instance.threshold.toString()=='UNSTABLE'}" />
+      <label for="task.evenIfUnstable">${%Trigger even if the build is unstable}</label>
+    </f:entry>
   </f:entry>
 </j:jelly>
