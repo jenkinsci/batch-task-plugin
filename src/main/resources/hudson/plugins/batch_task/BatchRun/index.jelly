@@ -6,15 +6,16 @@
     <l:header />
     <l:side-panel>
       <l:tasks>
-        <l:task icon="images/24x24/up.gif" href="${h.getNearestAncestorUrl(request,it.owner)}/" title="${%Back to List}" />
+        <l:task icon="images/24x24/up.gif" href="../" title="${%Back to List}" />
         <l:task icon="images/24x24/terminal.gif" href="${request.originalRequestURI}" title="${%Console}" />
+        <j:set var="isRunPath" value="${request.findAncestor(it.owner)!=null}" />
         <j:set var="p" value="${it.previous}" />
         <j:if test="${p!=null}">
-          <l:task icon="images/24x24/previous.gif" href="${rootURL}/${p.url}/" title="${%Previous}" />
+          <l:task icon="images/24x24/previous.gif" href="${isRunPath?rootURL+'/'+p.url:'../'+p.number}/" title="${%Previous}" />
         </j:if>
         <j:set var="n" value="${it.next}" />
         <j:if test="${n!=null}">
-          <l:task icon="images/24x24/next.gif" href="${rootURL}/${n.url}/" title="${%Next}" />
+          <l:task icon="images/24x24/next.gif" href="${isRunPath?rootURL+'/'+n.url:'../'+n.number}/" title="${%Next}" />
         </j:if>
       </l:tasks>
     </l:side-panel>
