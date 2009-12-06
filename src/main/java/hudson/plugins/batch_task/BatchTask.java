@@ -306,9 +306,9 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         rsp.forwardToPreviousPage(req);
 	}
 
-	public String getUrl() {
-    	return owner.getUrl() + "/batchTasks/task/" + name + "/";
-	}
+    public String getUrl() {
+    	return owner.getUrl() + "batchTasks/task/" + name + "/";
+    }
 
     static {
         // Used when BatchTask is in Queue at Hudson shutdown
