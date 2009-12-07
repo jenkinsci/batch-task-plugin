@@ -51,7 +51,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
 
     @DataBoundConstructor
     public BatchTask(String name, String script) {
-        this.name = name;
+        this.name = name.trim();
         this.script = script;
     }
 
