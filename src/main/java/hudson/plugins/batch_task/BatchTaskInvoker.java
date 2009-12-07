@@ -20,6 +20,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -64,7 +65,7 @@ public class BatchTaskInvoker extends Notifier {
             return bp.getTask(this.task);
         }
 
-        public boolean invoke(BuildListener listener) {
+        public boolean invoke(BuildListener listener, HashSet<String> seenJobs) {
             PrintStream logger = listener.getLogger();
 
             AbstractProject<?,?> p = Hudson.getInstance().getItemByFullName(project, AbstractProject.class);
@@ -79,14 +80,20 @@ public class BatchTaskInvoker extends Notifier {
                 return false;
             }
 
-            BatchTask task = bp.getTask(this.task);
-            if(task==null) {
-                listener.error(Messages.BatchTaskInvoker_NoSuchTask(task,bp.findNearestTask(this.task).name));
+            BatchTask taskObj = bp.getTask(task);
+            if(taskObj==null) {
+                listener.error(Messages.BatchTaskInvoker_NoSuchTask(task,bp.findNearestTask(task).name));
                 return false;
             }
 
-            logger.println(Messages.BatchTaskInvoker_Invoking(project,this.task,task.getNextBuildNumber()));
-            Hudson.getInstance().getQueue().schedule(task,0);
+            // Only report nextBuildNumber once per project
+            String buildNum = "";
+            if (!seenJobs.contains(project)) {
+                buildNum = " #" + taskObj.getNextBuildNumber();
+                seenJobs.add(project);
+            }
+            logger.println(Messages.BatchTaskInvoker_Invoking(project,task,buildNum));
+            Hudson.getInstance().getQueue().schedule(taskObj,0);
             return true;
         }
     }
@@ -122,9 +129,10 @@ public class BatchTaskInvoker extends Notifier {
 
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+        HashSet<String> seenJobs = new HashSet<String>();
         if (build.getResult().isBetterOrEqualTo(threshold)) {
             for (Config config : configs)
-                config.invoke(listener);
+                config.invoke(listener, seenJobs);
         }
         return true;
     }

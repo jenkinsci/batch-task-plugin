@@ -171,11 +171,14 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
     public BatchRun createExecutable() throws IOException {
         AbstractBuild<?,?> lb = owner.getLastBuild();
         if (lb == null) return null;
-        BatchRunAction records = lb.getAction(BatchRunAction.class);
-        if(records==null) {
-            records = new BatchRunAction(lb);
-            lb.addAction(records);
-            // we don't need to save it yet.
+        BatchRunAction records;
+        synchronized (lb) {
+            records = lb.getAction(BatchRunAction.class);
+            if(records==null) {
+                records = new BatchRunAction(lb);
+                lb.addAction(records);
+                // we don't need to save it yet.
+            }
         }
 
         return records.createRecord(this);
