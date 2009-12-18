@@ -252,9 +252,13 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
      */
     public synchronized void doExecute( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
         getACL().checkPermission(AbstractProject.BUILD);
-        
-        Hudson.getInstance().getQueue().schedule(this,0);
-        rsp.forwardToPreviousPage(req);
+
+        if (owner.getLastBuild() != null) {
+            Hudson.getInstance().getQueue().schedule(this,0);
+            rsp.forwardToPreviousPage(req);
+        } else {
+            rsp.sendRedirect2("noBuild");
+        }
     }
 
     /**
