@@ -5,8 +5,11 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Cause.UpstreamCause;
+import hudson.model.CauseAction;
 import hudson.model.Hudson;
 import hudson.model.Result;
+import hudson.model.Run;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.tasks.BuildStepMonitor;
@@ -65,7 +68,7 @@ public class BatchTaskInvoker extends Notifier {
             return bp.getTask(this.task);
         }
 
-        public boolean invoke(BuildListener listener, HashSet<String> seenJobs) {
+        public boolean invoke(AbstractBuild<?,?> build, BuildListener listener, HashSet<String> seenJobs) {
             PrintStream logger = listener.getLogger();
 
             AbstractProject<?,?> p = Hudson.getInstance().getItemByFullName(project, AbstractProject.class);
@@ -93,7 +96,8 @@ public class BatchTaskInvoker extends Notifier {
                 seenJobs.add(project);
             }
             logger.println(Messages.BatchTaskInvoker_Invoking(project,task,buildNum));
-            Hudson.getInstance().getQueue().schedule(taskObj,0);
+            Hudson.getInstance().getQueue().schedule(taskObj,0,
+                    new CauseAction(new UpstreamCause((Run)build)));
             return true;
         }
     }
@@ -132,7 +136,7 @@ public class BatchTaskInvoker extends Notifier {
         HashSet<String> seenJobs = new HashSet<String>();
         if (build.getResult().isBetterOrEqualTo(threshold)) {
             for (Config config : configs)
-                config.invoke(listener, seenJobs);
+                config.invoke(build, listener, seenJobs);
         }
         return true;
     }

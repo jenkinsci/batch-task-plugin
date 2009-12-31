@@ -4,6 +4,8 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractModelObject;
 import hudson.model.AbstractProject;
 import hudson.model.BallColor;
+import hudson.model.Cause.UserCause;
+import hudson.model.CauseAction;
 import hudson.model.Hudson;
 import hudson.model.Label;
 import hudson.model.Node;
@@ -254,7 +256,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         getACL().checkPermission(AbstractProject.BUILD);
 
         if (owner.getLastBuild() != null) {
-            Hudson.getInstance().getQueue().schedule(this,0);
+            Hudson.getInstance().getQueue().schedule(this,0,new CauseAction(new UserCause()));
             rsp.forwardToPreviousPage(req);
         } else {
             rsp.sendRedirect2("noBuild");

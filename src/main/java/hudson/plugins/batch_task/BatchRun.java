@@ -4,9 +4,9 @@ import hudson.Launcher;
 import hudson.Util;
 import hudson.AbortException;
 import hudson.model.AbstractBuild;
+import hudson.model.Actionable;
 import hudson.model.BallColor;
 import hudson.model.Executor;
-import hudson.model.ModelObject;
 import hudson.model.Queue.Executable;
 import hudson.model.Result;
 import hudson.tasks.BatchFile;
@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  * 
  * @author Kohsuke Kawaguchi
  */
-public final class BatchRun implements Executable, ModelObject, Comparable<BatchRun> {
+public final class BatchRun extends Actionable implements Executable, Comparable<BatchRun> {
     /**
      * Build result.
      * If null, we are still building.
@@ -169,6 +169,10 @@ public final class BatchRun implements Executable, ModelObject, Comparable<Batch
      */
     public String getUrl() {
         return parent.owner.getUrl()+"batchTasks/"+id;
+    }
+
+    public String getSearchUrl() {
+        return getUrl();
     }
 
     public String getDisplayName() {

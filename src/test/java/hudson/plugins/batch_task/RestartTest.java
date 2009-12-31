@@ -20,7 +20,6 @@ public class RestartTest extends HudsonTestCase {
         BatchTask t = new BatchTask("test", "echo hello");
         BatchTaskProperty bp = new BatchTaskProperty(t);
         p.addProperty(bp);
-        bp.setOwner(p); // work around until 1.279 release
         
         // schedule a build but make sure it stays in the queue
         Queue q = hudson.getQueue();
