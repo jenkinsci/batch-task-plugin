@@ -1,26 +1,36 @@
 package hudson.plugins.batch_task;
 
+import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.AbortException;
 import hudson.model.AbstractBuild;
 import hudson.model.Actionable;
 import hudson.model.BallColor;
+import hudson.model.Cause;
+import hudson.model.CauseAction;
+import hudson.model.Environment;
+import hudson.model.EnvironmentContributingAction;
 import hudson.model.Executor;
+import hudson.model.Hudson;
+import hudson.model.Node;
 import hudson.model.Queue.Executable;
 import hudson.model.Result;
+import hudson.model.StreamBuildListener;
+import hudson.slaves.NodeProperty;
 import hudson.tasks.BatchFile;
 import hudson.tasks.CommandInterpreter;
 import hudson.tasks.Shell;
 import hudson.util.Iterators;
-import hudson.util.StreamTaskListener;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.framework.io.LargeText;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.logging.Level;
@@ -205,26 +215,69 @@ public final class BatchRun extends Actionable implements Executable, Comparable
     }
 
     public void run() {
-        StreamTaskListener listener=null;
+        StreamBuildListener listener=null;
         try {
             long start = System.currentTimeMillis();
-            listener = new StreamTaskListener(getLogFile());
-            Launcher launcher = Executor.currentExecutor().getOwner().getNode().createLauncher(listener);
+            listener = new StreamBuildListener(new FileOutputStream(getLogFile()));
+            Node node = Executor.currentExecutor().getOwner().getNode();
+            Launcher launcher = node.createLauncher(listener);
 
             BatchTask task = getParent();
-            if(task==null)
-                throw new AbortException("ERROR: undefined taask \""+taskName+"\"");
+            if (task==null)
+                throw new AbortException("ERROR: undefined task \""+taskName+"\"");
+            AbstractBuild<?,?> lb = task.owner.getLastBuild();
+            if (lb.getWorkspace()==null)
+                throw new AbortException(lb.getFullDisplayName()+" doesn't have a workspace.");
 
             try {
+                // Copying some logic from AbstractBuild.AbstractRunner.createLauncher().
+                // buildEnvironments are discarded after the build runs, so we need to follow the
+                // same model here.. applying node properties, but leaving out build wrappers.
+                final ArrayList<Environment> buildEnvironments = new ArrayList<Environment>();
+                for (NodeProperty nodeProperty : Hudson.getInstance().getGlobalNodeProperties()) {
+                    Environment environment = nodeProperty.setUp(lb, launcher, listener);
+                    if (environment != null) buildEnvironments.add(environment);
+                }
+                for (NodeProperty nodeProperty : node.getNodeProperties()) {
+                    Environment environment = nodeProperty.setUp(lb, launcher, listener);
+                    if (environment != null) buildEnvironments.add(environment);
+                }
+
+                // This is the only way I found to inject things into the environment of
+                // CommandInterpreter.perform().. temporarily attach an action to the build.
+                // (if BatchTask/BatchRun are converted to extend AbstractProject/AbstractBuild,
+                //  BatchRun will use AbstractRunner and get global/node properties w/o extra code)
+                EnvironmentContributingAction envAct = new EnvironmentContributingAction() {
+                    public void buildEnvVars(AbstractBuild<?,?> build, EnvVars env) {
+                        // Apply global and node properties
+                        for (Environment e : buildEnvironments) e.buildEnvVars(env);
+                        // Our task id
+                        env.put("TASK_ID", getNumber());
+                        // User who triggered this task run, if applicable
+                        out: for (CauseAction ca : getActions(CauseAction.class))
+                            for (Cause c : ca.getCauses())
+                                if (c instanceof Cause.UserCause) {
+                                    env.put("HUDSON_USER", ((Cause.UserCause)c).getUserName());
+                                    break out;
+                                }
+                    }
+                    public String getDisplayName() { return null; }
+                    public String getIconFileName() { return null; }
+                    public String getUrlName() { return null; }
+                };
+
                 CommandInterpreter batchRunner;
                 if (launcher.isUnix())
                     batchRunner = new Shell(task.script);
                 else
                     batchRunner = new BatchFile(task.script);
-                AbstractBuild<?,?> lb = task.owner.getLastBuild();
-                if (lb.getWorkspace()==null)
-                    throw new AbortException(lb.getFullDisplayName()+" doesn't have a workspace.");
-                result = batchRunner.perform(lb,launcher,listener) ? Result.SUCCESS : Result.FAILURE;
+                try {
+                    lb.getActions().add(envAct);
+                    result = batchRunner.perform(lb,launcher,listener) ? Result.SUCCESS : Result.FAILURE;
+                } finally {
+                    lb.getActions().remove(envAct);
+                    for (Environment e : buildEnvironments) e.tearDown(lb, listener);
+                }
             } catch (InterruptedException e) {
                 listener.getLogger().println("ABORTED");
                 result = Result.ABORTED;
@@ -241,7 +294,7 @@ public final class BatchRun extends Actionable implements Executable, Comparable
             LOGGER.log(Level.SEVERE, "Failed to write "+getLogFile(),e);
         } finally {
             if(listener!=null)
-                listener.close();
+                listener.getLogger().close();
             if (result==null)
                 result = Result.FAILURE;
         }

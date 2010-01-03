@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2004-2009, Sun Microsystems, Inc., Alan Harder
+ * Copyright (c) 2004-2010, Sun Microsystems, Inc., Alan Harder
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,14 @@
 package hudson.plugins.batch_task;
 
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import hudson.Util;
 import hudson.model.Cause.UpstreamCause;
 import hudson.model.Cause.UserCause;
 import hudson.model.CauseAction;
 import hudson.model.FreeStyleProject;
 import hudson.model.Queue;
 import hudson.model.Result;
+import hudson.slaves.EnvironmentVariablesNodeProperty;
 import java.util.concurrent.TimeUnit;
 import org.jvnet.hudson.test.HudsonTestCase;
 
@@ -52,11 +54,19 @@ public class BatchTaskTest extends HudsonTestCase {
     }
 
     /**
-     * Verify UserCause is added when user triggers a task.
+     * Verify UserCause is added when user triggers a task.  Check env vars too:
+     *  TASK_ID for this run, global and node properties, HUDSON_USER if triggered
+     *  by a user.
      */
     public void testExecute() throws Exception {
-        FreeStyleProject p = createFreeStyleProject();
-        BatchTask task = new BatchTask("test", "echo hello");
+        hudson.getGlobalNodeProperties().add(new EnvironmentVariablesNodeProperty(
+                new EnvironmentVariablesNodeProperty.Entry("GLOBAL", "global-property"),
+                new EnvironmentVariablesNodeProperty.Entry("OVERRIDE_ME", "foo")));
+        hudson.getNodeProperties().add(new EnvironmentVariablesNodeProperty(
+                new EnvironmentVariablesNodeProperty.Entry("OVERRIDE_ME", "bar")));
+        FreeStyleProject p = createFreeStyleProject("execute");
+        BatchTask task = new BatchTask("test",
+                "echo \"$TASK_ID:$GLOBAL:$OVERRIDE_ME:$HUDSON_USER\"\n");
         p.addProperty(new BatchTaskProperty(task));
         p.scheduleBuild2(0).get();
         new WebClient().getPage(p, "batchTasks/task/test/execute");
@@ -68,17 +78,20 @@ public class BatchTaskTest extends HudsonTestCase {
         assertNotNull("CauseAction not found", ca);
         assertEquals("Cause type", UserCause.class.getName(),
                 ca.getCauses().get(0).getClass().getName());
+        String log = Util.loadFile(run.getLogFile());
+        assertTrue("Expected 1-1:global-property:bar:anonymous in task output: " + log,
+                log.contains("1-1:global-property:bar:anonymous"));
     }
 
     /**
-     * Verify UpstreamCause is added when another job triggers a task.
+     * Verify UpstreamCause is added when a job triggers a task.
      */
     public void testInvoker() throws Exception {
-        FreeStyleProject p = createFreeStyleProject();
-        BatchTask task = new BatchTask("test", "echo hello");
+        FreeStyleProject p = createFreeStyleProject("tasker");
+        BatchTask task = new BatchTask("test", "echo hello\n");
         p.addProperty(new BatchTaskProperty(task));
         p.scheduleBuild2(0).get();
-        FreeStyleProject up = createFreeStyleProject();
+        FreeStyleProject up = createFreeStyleProject("invoker");
         up.getPublishersList().add(new BatchTaskInvoker(
                 new BatchTaskInvoker.Config[] { new BatchTaskInvoker.Config(p.getFullName(), "test") },
                 Result.SUCCESS));
