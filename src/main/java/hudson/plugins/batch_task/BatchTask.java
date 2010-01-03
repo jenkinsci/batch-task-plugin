@@ -90,6 +90,10 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         return name;
     }
 
+    public boolean isConcurrentBuild() {
+        return false;
+    }
+
     public long getEstimatedDuration() {
         BatchRun b = getLastSuccessfulRun();
         if(b==null)     return -1;
