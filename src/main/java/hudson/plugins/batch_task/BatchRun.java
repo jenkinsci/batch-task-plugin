@@ -4,6 +4,7 @@ import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.AbortException;
+import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.Actionable;
 import hudson.model.BallColor;
@@ -18,6 +19,7 @@ import hudson.model.Queue.Executable;
 import hudson.model.Result;
 import hudson.model.StreamBuildListener;
 import hudson.slaves.NodeProperty;
+import hudson.slaves.WorkspaceList.Lease;
 import hudson.tasks.BatchFile;
 import hudson.tasks.CommandInterpreter;
 import hudson.tasks.Shell;
@@ -226,7 +228,8 @@ public final class BatchRun extends Actionable implements Executable, Comparable
             if (task==null)
                 throw new AbortException("ERROR: undefined task \""+taskName+"\"");
             AbstractBuild<?,?> lb = task.owner.getLastBuild();
-            if (lb.getWorkspace()==null)
+            FilePath ws = lb.getWorkspace();
+            if (ws==null)
                 throw new AbortException(lb.getFullDisplayName()+" doesn't have a workspace.");
 
             try {
@@ -271,10 +274,17 @@ public final class BatchRun extends Actionable implements Executable, Comparable
                     batchRunner = new Shell(task.script);
                 else
                     batchRunner = new BatchFile(task.script);
+                Lease wsLease = null;
                 try {
+                    // Lock the workspace
+                    wsLease = lb.getBuiltOn().toComputer().getWorkspaceList().acquire(ws,
+                            !task.owner.isConcurrentBuild());
+                    // Add environment to build so it will apply when task runs
                     lb.getActions().add(envAct);
+                    // Run the task
                     result = batchRunner.perform(lb,launcher,listener) ? Result.SUCCESS : Result.FAILURE;
                 } finally {
+                    if (wsLease != null) wsLease.release();
                     lb.getActions().remove(envAct);
                     for (Environment e : buildEnvironments) e.tearDown(lb, listener);
                 }
