@@ -2,6 +2,7 @@ package hudson.plugins.batch_task;
 
 import hudson.model.AbstractProject;
 import hudson.model.Action;
+import hudson.model.Run;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -26,7 +27,15 @@ public class BatchTaskAction implements Action {
     }
 
     public String getIconFileName() {
-        if(property.getTasks().isEmpty()) return null;
+        List<BatchTask> tasks = property.getTasks();
+        if (tasks.isEmpty()) return null;
+        // Show animated ball icon if a task is running now
+        Run run = project.getLastBuild();
+        BatchRunAction bra = run != null ? run.getAction(BatchRunAction.class) : null;
+        if (bra != null)
+            for (BatchRun br : bra.records)
+                if (br.isRunning())
+                    return br.getBuildStatusUrl();
         return "gear2.gif";
     }
 
