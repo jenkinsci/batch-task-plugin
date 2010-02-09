@@ -2,8 +2,11 @@
   Specify the shell script to be executed when the execution of the task is selected.
   This is where the actual work happens. When the script executes, the current directory
   will be <a href="../ws/">the workspace directory</a>, just like the shell script builder.
-
-  So dependin on your
-  SCM, you might have to cd into a directory. Try "pwd" and "ls" to find out whether you need
-  that or not.
+  So depending on your SCM, you might have to cd into a directory.
+  Try <tt>pwd</tt> and <tt>ls</tt> to find out whether you need that or not.
+  <br/>
+  Environment variables from the latest build are available to the task script.
+  In addition, <tt>TASK_ID</tt> is set to the identifier for this task run
+  ("build#-task#"), and <tt>HUDSON_USER</tt> is set to the user who started the task,
+  if it was manually triggered.
 </div>
