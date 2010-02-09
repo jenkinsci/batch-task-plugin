@@ -8,13 +8,14 @@
             <f:textbox name="batch-task.name" value="${t.name}" />
           </f:entry>
           <f:entry title="${%Script}" help="/plugin/batch-task/help-script.html">
-            <textarea class="setting-input" name="batch-task.script"
-              rows="5" style="width:100%">${t.script}</textarea>
+            <f:textarea name="batch-task.script" value="${t.script}" />
           </f:entry>
           <f:entry>
             <div align="right">
-              <input type="button" value="${%Add another task...}" class="repeatable-add show-if-last" />
-              <input type="button" value="${%Delete}" class="repeatable-delete show-if-not-only" style="margin-left: 1em;" />
+              <input type="button" value="${%Add another task...}"
+                     class="repeatable-add show-if-last" />
+              <input type="button" value="${%Delete}"
+                     class="repeatable-delete show-if-not-only" style="margin-left: 1em;" />
             </div>
           </f:entry>
         </table>
