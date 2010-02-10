@@ -8,6 +8,7 @@ import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.Actionable;
 import hudson.model.BallColor;
+import hudson.model.BuildableItemWithBuildWrappers;
 import hudson.model.Cause;
 import hudson.model.CauseAction;
 import hudson.model.Environment;
@@ -21,6 +22,7 @@ import hudson.model.StreamBuildListener;
 import hudson.slaves.NodeProperty;
 import hudson.slaves.WorkspaceList.Lease;
 import hudson.tasks.BatchFile;
+import hudson.tasks.BuildWrapper;
 import hudson.tasks.CommandInterpreter;
 import hudson.tasks.Shell;
 import hudson.util.Iterators;
@@ -245,6 +247,14 @@ public final class BatchRun extends Actionable implements Executable, Comparable
                     Environment environment = nodeProperty.setUp(lb, launcher, listener);
                     if (environment != null) buildEnvironments.add(environment);
                 }
+                // Not sure if tasks should use all build wrappers (xvnc for example),
+                // but look for one in particular, from setenv plugin.
+                if (task.owner instanceof BuildableItemWithBuildWrappers)
+                    for (BuildWrapper bw : ((BuildableItemWithBuildWrappers)task.owner).getBuildWrappersList())
+                        if ("hudson.plugins.setenv.SetEnvBuildWrapper".equals(bw.getClass().getName())) {
+                            Environment environment = bw.setUp(lb, launcher, listener);
+                            if (environment != null) buildEnvironments.add(environment);
+                        }
 
                 // This is the only way I found to inject things into the environment of
                 // CommandInterpreter.perform().. temporarily attach an action to the build.
