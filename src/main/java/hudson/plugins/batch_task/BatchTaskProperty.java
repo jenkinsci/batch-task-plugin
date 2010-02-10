@@ -79,8 +79,8 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
     }
 
     @Override
-    public Action getJobAction(AbstractProject<?,?> job) {
-        return new BatchTaskAction(job, this);
+    public Collection<? extends Action> getJobActions(AbstractProject<?,?> job) {
+        return Collections.singletonList(new BatchTaskAction(job, this));
     }
 
     @Override

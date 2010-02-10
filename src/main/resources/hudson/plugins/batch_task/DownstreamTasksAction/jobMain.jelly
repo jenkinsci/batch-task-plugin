@@ -1,0 +1,18 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <h3>${%Downstream Tasks}</h3>
+  <ul>
+    <j:forEach var="config" items="${it.taskConfigs}">
+      <j:set var="task" value="${config.resolve()}"/>
+      <li>
+        <j:choose>
+          <j:when test="${task!=null}">
+            <a href="${rootURL}/${task.url}">${task.fullDisplayName}</a>
+          </j:when>
+          <j:otherwise>
+            ${%Invalid entry:} ${config.project} &amp;raquo; ${config.task}
+          </j:otherwise>
+        </j:choose>
+      </li>
+    </j:forEach>
+  </ul>
+</j:jelly>

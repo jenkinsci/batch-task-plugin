@@ -77,7 +77,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         return owner.isBuildBlocked();
     }
 
-    // Deprecated.. leave in for a while to support Hudson < 1.330
+    @SuppressWarnings("deprecation")
     public String getWhyBlocked() {
         return owner.getWhyBlocked();
     }
