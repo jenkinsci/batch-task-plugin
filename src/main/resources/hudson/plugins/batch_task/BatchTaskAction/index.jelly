@@ -19,7 +19,7 @@
     <l:main-panel>
       <h1>${%Batch Tasks}</h1>
       <t:setIconSize/>
-      <table class="sortable pane" id="projectstatus">
+      <table class="sortable pane bigtable" id="projectstatus">
         <tr>
           <th style="padding-left:1.5em">${%S}</th>
           <th initialSortDir="down">${%Task}</th>
@@ -57,6 +57,7 @@
                 </form>
               </j:if>
             </td>
+            <td></td>
           </tr>
         </j:forEach>
       </table>
