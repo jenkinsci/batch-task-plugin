@@ -5,6 +5,7 @@ import hudson.model.AbstractModelObject;
 import hudson.model.AbstractProject;
 import hudson.model.BallColor;
 import hudson.model.Cause.UserCause;
+import hudson.model.Queue.Task;
 import hudson.model.CauseAction;
 import hudson.model.Hudson;
 import hudson.model.Label;
@@ -14,6 +15,7 @@ import hudson.model.ResourceList;
 import hudson.model.Result;
 import hudson.model.Job;
 import hudson.model.queue.CauseOfBlockage;
+import hudson.model.queue.SubTask;
 import hudson.util.Iterators;
 import hudson.widgets.BuildHistoryWidget;
 import hudson.widgets.HistoryWidget;
@@ -25,6 +27,8 @@ import org.kohsuke.stapler.StaplerResponse;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
@@ -351,5 +355,26 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
                 return bt.owner.getFullName()+"/"+bt.name;
             }
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Collection<? extends SubTask> getSubTasks() {
+        return Collections.singleton(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Task getOwnerTask() {
+       return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Object getSameNodeConstraint() {
+        return null;
     }
 }

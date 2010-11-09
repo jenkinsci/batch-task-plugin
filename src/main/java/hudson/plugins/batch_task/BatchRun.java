@@ -338,6 +338,10 @@ public final class BatchRun extends Actionable implements Executable, Comparable
     public int compareTo(BatchRun that) {
         return that.timestamp.compareTo(this.timestamp);
     }
+    
+    public long getEstimatedDuration() {
+        return getParent().getEstimatedDuration();
+    }
 
     private static final Logger LOGGER = Logger.getLogger(BatchRun.class.getName());
 }
