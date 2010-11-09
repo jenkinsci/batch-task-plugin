@@ -37,7 +37,7 @@ import org.jvnet.hudson.test.HudsonTestCase;
 
 /**
  * Tests for batch tasks plugin.
- * @author Alan.Harder@sun.com
+ * @author Alan Harder
  */
 public class BatchTaskTest extends HudsonTestCase {
 

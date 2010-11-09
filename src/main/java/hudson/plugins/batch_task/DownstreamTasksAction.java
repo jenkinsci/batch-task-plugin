@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Shows the downstream tasks.
  *
- * @author Alan.Harder@Sun.Com
+ * @author Alan Harder
  */
 public class DownstreamTasksAction extends InvisibleAction {
     public final BatchTaskInvoker downstream;
