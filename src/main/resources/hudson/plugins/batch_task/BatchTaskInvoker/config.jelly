@@ -42,7 +42,7 @@
     <f:entry title="">
       <f:checkbox id="task.evenIfUnstable" name="task.evenIfUnstable"
        checked="${instance.threshold.toString()=='UNSTABLE'}" />
-      <label for="task.evenIfUnstable">${%Trigger even if the build is unstable}</label>
+      <label class="attach-previous">${%Trigger even if the build is unstable}</label>
     </f:entry>
   </f:entry>
 </j:jelly>
