@@ -23,4 +23,18 @@
       <name>Alan Harder</name>
     </developer>
   </developers>
+  
+  <build>
+  	<plugins>
+  		<plugin>
+  			<artifactId>maven-surefire-plugin</artifactId>
+  			<configuration>
+  				<!-- TODO: please remove this exclude, once the parent is updated to v1.385+ -->
+  				<excludes>
+  					<exclude>**/BatchRunTest.*</exclude>
+  				</excludes>
+  			</configuration>
+  		</plugin>
+  	</plugins>
+  </build>
 </project>
