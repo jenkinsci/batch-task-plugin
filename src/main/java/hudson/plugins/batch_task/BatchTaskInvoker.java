@@ -10,6 +10,7 @@ import hudson.model.BuildListener;
 import hudson.model.Cause.UpstreamCause;
 import hudson.model.CauseAction;
 import hudson.model.Descriptor;
+import hudson.model.ItemGroup;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.tasks.BuildStepDescriptor;
@@ -50,15 +51,11 @@ public class BatchTaskInvoker extends Notifier {
             this.task = task;
         }
 
-        public Config(JSONObject source) {
-            this(source.getString("project").trim(), source.getString("task").trim());
-        }
-
         /**
          * Finds the target {@link BatchTaskProperty}.
          */
-        public BatchTaskProperty resolveProperty() {
-            AbstractProject<?,?> p = Jenkins.getInstance().getItemByFullName(project, AbstractProject.class);
+        public BatchTaskProperty resolveProperty(ItemGroup context) {
+            AbstractProject<?,?> p = Jenkins.getInstance().getItem(project, context, AbstractProject.class);
             if(p==null)     return null;
             return p.getProperty(BatchTaskProperty.class);
         }
@@ -67,17 +64,31 @@ public class BatchTaskInvoker extends Notifier {
          * Finds the target {@link BatchTask} that this configuration points to,
          * or null if not found.
          */
-        public BatchTask resolve() {
-            BatchTaskProperty bp = resolveProperty();
+        public BatchTask resolve(ItemGroup context) {
+            BatchTaskProperty bp = resolveProperty(context);
             if(bp==null)    return null;
 
             return bp.getTask(this.task);
         }
 
+        /**
+         * @deprecated as of 1.15
+         */
+        public BatchTask resolve() {
+            return resolve(Jenkins.getInstance());
+        }
+
+        /**
+         * @deprecated as of 1.15
+         */
+        public BatchTaskProperty resolveProperty() {
+            return resolveProperty(null);
+        }
+
         public boolean invoke(AbstractBuild<?,?> build, BuildListener listener, HashSet<String> seenJobs) {
             PrintStream logger = listener.getLogger();
 
-            AbstractProject<?,?> p = Jenkins.getInstance().getItemByFullName(project, AbstractProject.class);
+            AbstractProject<?,?> p = Jenkins.getInstance().getItem(project, build.getProject(), AbstractProject.class);
             if(p==null) {
                 listener.error(Messages.BatchTaskInvoker_NoSuchProject(project));
                 return false;
