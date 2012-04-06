@@ -7,7 +7,7 @@
   </parent>
   
   <artifactId>batch-task</artifactId>
-  <version>1.15-SNAPSHOT</version>
+  <version>1.15</version>
   <packaging>hpi</packaging>
   <name>Jenkins batch task plugin</name>
   <url>http://wiki.jenkins-ci.org/display/JENKINS/Batch+Task+Plugin</url>
