@@ -1,48 +1,11 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <f:entry>
-    <f:repeatable var="config" items="${instance.configs}" noAddButton="true" minimum="1">
-      <table width="100%">
-        <f:entry title="${%Project}">
-          <f:textbox name="task.invoker.project" value="${config.project}" onchange="batchTask.updateTaskList(this)" />
-        </f:entry>
-        <f:entry title="${%Task}">
-          <select class="setting-input" name="task.invoker.task">
-            <j:forEach var="task" items="${config.resolveProperty().tasks}">
-              <f:option selected="${task.name==config.task}" value="${task.name}">${task.name}</f:option>
-            </j:forEach>
-          </select>
-        </f:entry>
-        <f:entry>
-          <div align="right">
-            <input type="button" value="${%Add another task...}" class="repeatable-add show-if-last" />
-            <input type="button" value="${%Delete}" class="repeatable-delete show-if-not-only" style="margin-left: 1em;" />
-          </div>
-        </f:entry>
-      </table>
-    </f:repeatable>
-    <script>// &lt;![CDATA[
-      var batchTask = {
-        <!-- Fill the combo box by using the configured project name -->
-        updateTaskList : function(e) {
-          try {
-            var Dom = YAHOO.util.Dom;
-            var tr = Dom.getAncestorByTagName(e,"TR").nextSibling;
-            while(tr.getAttribute("class")!=null)
-              tr=tr.nextSibling;
-            var combo = tr.getElementsByTagName("SELECT")[0];
-
-            updateListBox(combo,"${descriptor.descriptorFullUrl}/getTaskListJson?name="+encodeURIComponent(e.value));
-          } catch(e) {
-            alert(e);
-          }
-        }
-      };
-    // ]]&gt;
-    </script>
+    <f:repeatableProperty field="configs" noAddButton="true" minimum="1" />
     <f:entry title="">
-      <f:checkbox id="task.evenIfUnstable" name="task.evenIfUnstable"
-       checked="${instance.threshold.toString()=='UNSTABLE'}" />
-      <label class="attach-previous">${%Trigger even if the build is unstable}</label>
+      <label>
+        <f:checkbox field="evenIfUnstable" />
+        ${%Trigger even if the build is unstable}
+      </label>
     </f:entry>
   </f:entry>
 </j:jelly>

@@ -3,31 +3,28 @@ package hudson.plugins.batch_task;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractDescribableImpl;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.Cause.UpstreamCause;
 import hudson.model.CauseAction;
-import hudson.model.Hudson;
+import hudson.model.Descriptor;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.tasks.BuildStepDescriptor;
-import hudson.tasks.Publisher;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
+import hudson.tasks.Publisher;
 import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
 
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,10 +40,11 @@ public class BatchTaskInvoker extends Notifier {
     /**
      * What task to invoke?
      */
-    public static final class Config {
+    public static final class Config extends AbstractDescribableImpl<Config> {
         public final String project;
         public final String task;
 
+        @DataBoundConstructor
         public Config(String project, String task) {
             this.project = project;
             this.task = task;
@@ -108,6 +106,29 @@ public class BatchTaskInvoker extends Notifier {
                     new CauseAction(new UpstreamCause((Run)build)));
             return true;
         }
+
+        @Extension
+        public static class DescriptorImpl extends Descriptor<Config> {
+            @Override
+            public String getDisplayName() {
+                return "";
+            }
+
+            public ListBoxModel doFillTaskItems(@QueryParameter String project, @AncestorInPath AbstractProject context) {
+                // when the item is not found, the user should be getting an error from elsewhere.
+                ListBoxModel r = new ListBoxModel();
+
+                AbstractProject<?,?> p = Jenkins.getInstance().getItem(project, context, AbstractProject.class);
+                if(p!=null) {
+                    BatchTaskProperty bp = p.getProperty(BatchTaskProperty.class);
+                    if(bp!=null) {
+                        for(BatchTask task : bp.getTasks())
+                            r.add(task.getDisplayName(), task.getName());
+                    }
+                }
+                return r;
+            }
+        }
     }
 
     private final Config[] configs;
@@ -118,17 +139,14 @@ public class BatchTaskInvoker extends Notifier {
         return this;
     }
 
+    @DataBoundConstructor
+    public BatchTaskInvoker(Config[] configs, boolean evenIfUnstable) {
+        this(configs,evenIfUnstable ? Result.UNSTABLE : Result.SUCCESS);
+    }
+
     public BatchTaskInvoker(Config[] configs, Result threshold) {
         this.configs = configs;
         this.threshold = threshold;
-    }
-
-    public BatchTaskInvoker(JSONObject source) {
-        List<Config> configList = new ArrayList<Config>();
-        for( Object o : JSONArray.fromObject(source.get("config")) )
-            configList.add(new Config((JSONObject)o));
-        this.configs = configList.toArray(new Config[configList.size()]);
-        this.threshold = source.getBoolean("evenIfUnstable") ? Result.UNSTABLE : Result.SUCCESS;
     }
 
     public List<Config> getConfigs() {
@@ -137,6 +155,10 @@ public class BatchTaskInvoker extends Notifier {
 
     public Result getThreshold() {
         return threshold;
+    }
+
+    public boolean isEvenIfUnstable() {
+        return threshold.isWorseOrEqualTo(Result.UNSTABLE);
     }
 
     @Override
@@ -158,47 +180,15 @@ public class BatchTaskInvoker extends Notifier {
         return Collections.singletonList(new DownstreamTasksAction(this));
     }
 
-    @Override
-    public BuildStepDescriptor<Publisher> getDescriptor() {
-        return DescriptorImpl.INSTANCE;
-    }
-
+    @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
-        private DescriptorImpl() {
-            super(BatchTaskInvoker.class);
-        }
-
         public String getDisplayName() {
             return Messages.BatchTaskInvoker_DisplayName();
-        }
-
-        @Override
-        public BatchTaskInvoker newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-            return new BatchTaskInvoker(formData);
         }
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {
             return true;
         }
-
-        public void doGetTaskListJson(StaplerRequest req, StaplerResponse rsp, @AncestorInPath AbstractProject project, @QueryParameter("name") String name) throws IOException, ServletException {
-            // when the item is not found, the user should be getting an error from elsewhere.
-            ListBoxModel r = new ListBoxModel();
-
-            AbstractProject<?,?> p = Jenkins.getInstance().getItem(name, project, AbstractProject.class);
-            if(p!=null) {
-                BatchTaskProperty bp = p.getProperty(BatchTaskProperty.class);
-                if(bp!=null) {
-                    for(BatchTask task : bp.getTasks())
-                        r.add(new ListBoxModel.Option(task.getName()));
-                }
-            }
-
-            r.writeTo(req,rsp);
-        }
-
-        @Extension
-        public static final DescriptorImpl INSTANCE = new DescriptorImpl();
     }
 }
