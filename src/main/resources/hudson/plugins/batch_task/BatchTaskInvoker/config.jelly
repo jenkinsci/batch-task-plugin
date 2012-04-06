@@ -31,7 +31,7 @@
               tr=tr.nextSibling;
             var combo = tr.getElementsByTagName("SELECT")[0];
 
-            updateListBox(combo,"${rootURL}/plugin/batch-task/getTaskListJson?name="+encodeURIComponent(e.value));
+            updateListBox(combo,"${descriptor.descriptorFullUrl}/getTaskListJson?name="+encodeURIComponent(e.value));
           } catch(e) {
             alert(e);
           }

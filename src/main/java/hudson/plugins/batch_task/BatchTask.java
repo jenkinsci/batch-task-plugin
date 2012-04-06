@@ -21,6 +21,7 @@ import hudson.widgets.BuildHistoryWidget;
 import hudson.widgets.HistoryWidget;
 import hudson.widgets.HistoryWidget.Adapter;
 import hudson.security.ACL;
+import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -264,7 +265,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
         getACL().checkPermission(AbstractProject.BUILD);
 
         if (owner.getLastBuild() != null) {
-            Hudson.getInstance().getQueue().schedule(this,0,new CauseAction(new UserCause()));
+            Jenkins.getInstance().getQueue().schedule(this,0,new CauseAction(new UserCause()));
             rsp.forwardToPreviousPage(req);
         } else {
             rsp.sendRedirect2("noBuild");
@@ -319,7 +320,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
 			throws IOException, ServletException {
         checkAbortPermission();
 
-        Hudson.getInstance().getQueue().cancel(this);
+        Jenkins.getInstance().getQueue().cancel(this);
         rsp.forwardToPreviousPage(req);
 	}
 
@@ -342,7 +343,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
                 if(idx<0)   throw new NoSuchElementException("Illegal format: "+str);
 
                 String projectName = str.substring(0, idx);
-                Job<?,?> job = (Job<?,?>) Hudson.getInstance().getItemByFullName(projectName);
+                Job<?,?> job = (Job<?,?>) Jenkins.getInstance().getItemByFullName(projectName);
                 if(job==null)  throw new NoSuchElementException("No such job exists: "+projectName);
                 BatchTaskProperty bp = job.getProperty(BatchTaskProperty.class);
                 if(bp==null)  throw new NoSuchElementException(projectName+" doesn't have the batck task anymore");

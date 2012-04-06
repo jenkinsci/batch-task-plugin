@@ -15,10 +15,16 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
+import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -54,7 +60,7 @@ public class BatchTaskInvoker extends Notifier {
          * Finds the target {@link BatchTaskProperty}.
          */
         public BatchTaskProperty resolveProperty() {
-            AbstractProject<?,?> p = Hudson.getInstance().getItemByFullName(project, AbstractProject.class);
+            AbstractProject<?,?> p = Jenkins.getInstance().getItemByFullName(project, AbstractProject.class);
             if(p==null)     return null;
             return p.getProperty(BatchTaskProperty.class);
         }
@@ -73,7 +79,7 @@ public class BatchTaskInvoker extends Notifier {
         public boolean invoke(AbstractBuild<?,?> build, BuildListener listener, HashSet<String> seenJobs) {
             PrintStream logger = listener.getLogger();
 
-            AbstractProject<?,?> p = Hudson.getInstance().getItemByFullName(project, AbstractProject.class);
+            AbstractProject<?,?> p = Jenkins.getInstance().getItemByFullName(project, AbstractProject.class);
             if(p==null) {
                 listener.error(Messages.BatchTaskInvoker_NoSuchProject(project));
                 return false;
@@ -98,7 +104,7 @@ public class BatchTaskInvoker extends Notifier {
                 seenJobs.add(project);
             }
             logger.println(Messages.BatchTaskInvoker_Invoking(project,task,buildNum));
-            Hudson.getInstance().getQueue().schedule(taskObj,0,
+            Jenkins.getInstance().getQueue().schedule(taskObj,0,
                     new CauseAction(new UpstreamCause((Run)build)));
             return true;
         }
@@ -174,6 +180,22 @@ public class BatchTaskInvoker extends Notifier {
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {
             return true;
+        }
+
+        public void doGetTaskListJson(StaplerRequest req, StaplerResponse rsp, @AncestorInPath AbstractProject project, @QueryParameter("name") String name) throws IOException, ServletException {
+            // when the item is not found, the user should be getting an error from elsewhere.
+            ListBoxModel r = new ListBoxModel();
+
+            AbstractProject<?,?> p = Jenkins.getInstance().getItem(name, project, AbstractProject.class);
+            if(p!=null) {
+                BatchTaskProperty bp = p.getProperty(BatchTaskProperty.class);
+                if(bp!=null) {
+                    for(BatchTask task : bp.getTasks())
+                        r.add(new ListBoxModel.Option(task.getName()));
+                }
+            }
+
+            r.writeTo(req,rsp);
         }
 
         @Extension

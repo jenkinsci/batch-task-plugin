@@ -26,6 +26,7 @@ import hudson.tasks.BuildWrapper;
 import hudson.tasks.CommandInterpreter;
 import hudson.tasks.Shell;
 import hudson.util.Iterators;
+import jenkins.model.Jenkins;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
@@ -239,7 +240,7 @@ public final class BatchRun extends Actionable implements Executable, Comparable
                 // buildEnvironments are discarded after the build runs, so we need to follow the
                 // same model here.. applying node properties, but leaving out build wrappers.
                 final ArrayList<Environment> buildEnvironments = new ArrayList<Environment>();
-                for (NodeProperty nodeProperty : Hudson.getInstance().getGlobalNodeProperties()) {
+                for (NodeProperty nodeProperty : Jenkins.getInstance().getGlobalNodeProperties()) {
                     Environment environment = nodeProperty.setUp(lb, launcher, listener);
                     if (environment != null) buildEnvironments.add(environment);
                 }
