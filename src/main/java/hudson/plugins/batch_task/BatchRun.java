@@ -1,32 +1,15 @@
 package hudson.plugins.batch_task;
 
-import hudson.EnvVars;
-import hudson.Launcher;
-import hudson.Util;
-import hudson.AbortException;
-import hudson.FilePath;
-import hudson.model.AbstractBuild;
-import hudson.model.Actionable;
-import hudson.model.BallColor;
-import hudson.model.BuildableItemWithBuildWrappers;
-import hudson.model.Cause;
-import hudson.model.CauseAction;
-import hudson.model.Environment;
-import hudson.model.EnvironmentContributingAction;
-import hudson.model.Executor;
-import hudson.model.Hudson;
-import hudson.model.Node;
+import hudson.*;
+import hudson.model.*;
 import hudson.model.Queue.Executable;
-import hudson.model.Result;
-import hudson.model.StreamBuildListener;
-import hudson.slaves.NodeProperty;
 import hudson.slaves.WorkspaceList.Lease;
 import hudson.tasks.BatchFile;
-import hudson.tasks.BuildWrapper;
 import hudson.tasks.CommandInterpreter;
 import hudson.tasks.Shell;
 import hudson.util.Iterators;
-import jenkins.model.Jenkins;
+import org.jenkinsci.lib.envinject.EnvInjectException;
+import org.jenkinsci.lib.envinject.service.EnvVarsResolver;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
@@ -43,7 +26,7 @@ import java.util.logging.Logger;
 
 /**
  * Record of {@link BatchTask} execution.
- * 
+ *
  * @author Kohsuke Kawaguchi
  */
 public final class BatchRun extends Actionable implements Executable, Comparable<BatchRun> {
@@ -63,6 +46,7 @@ public final class BatchRun extends Actionable implements Executable, Comparable
 
     /**
      * Pointer that connects us back to {@link BatchTask}
+     *
      * @see #getParent()
      */
     public final String taskName;
@@ -87,17 +71,16 @@ public final class BatchRun extends Actionable implements Executable, Comparable
      * Is this task still running?
      */
     public boolean isRunning() {
-        return result==null;
+        return result == null;
     }
 
     /**
      * Gets the string that says how long since this run has started.
      *
-     * @return
-     *      string like "3 minutes" "1 day" etc.
+     * @return string like "3 minutes" "1 day" etc.
      */
     public String getTimestampString() {
-        long time = new GregorianCalendar().getTimeInMillis()-timestamp.getTimeInMillis();
+        long time = new GregorianCalendar().getTimeInMillis() - timestamp.getTimeInMillis();
         return Util.getTimeSpanString(time);
     }
 
@@ -105,12 +88,12 @@ public final class BatchRun extends Actionable implements Executable, Comparable
      * Gets the log file that stores the execution result.
      */
     public File getLogFile() {
-        return new File(parent.owner.getRootDir(),"task-"+id+".log");
+        return new File(parent.owner.getRootDir(), "task-" + id + ".log");
     }
 
     public BatchTask getParent() {
         BatchTaskAction jta = parent.owner.getProject().getAction(BatchTaskAction.class);
-        if(jta==null)   return null;
+        if (jta == null) return null;
         return jta.getTask(taskName);
     }
 
@@ -122,7 +105,7 @@ public final class BatchRun extends Actionable implements Executable, Comparable
      * Gets the icon color for display.
      */
     public BallColor getIconColor() {
-        if(!isRunning()) {
+        if (!isRunning()) {
             // already built
             return getResult().color;
         }
@@ -130,7 +113,7 @@ public final class BatchRun extends Actionable implements Executable, Comparable
         // a new build is in progress
         BatchRun previous = getPrevious();
         BallColor baseColor;
-        if(previous==null)
+        if (previous == null)
             baseColor = BallColor.GREY_ANIME;
         else
             baseColor = previous.getIconColor();
@@ -147,13 +130,13 @@ public final class BatchRun extends Actionable implements Executable, Comparable
      */
     public BatchRun getPrevious() {
         // check siblings
-        for( AbstractBuild<?,?> b=parent.owner; b!=null; b=b.getPreviousBuild()) {
+        for (AbstractBuild<?, ?> b = parent.owner; b != null; b = b.getPreviousBuild()) {
             BatchRunAction records = b.getAction(BatchRunAction.class);
-            if(records==null)   continue;
+            if (records == null) continue;
             for (BatchRun r : records.records) {
-                if( r.taskName.equals(taskName)
-                 && r.timestamp.compareTo(this.timestamp)<0 ) // must be older than this
-                return r;
+                if (r.taskName.equals(taskName)
+                        && r.timestamp.compareTo(this.timestamp) < 0) // must be older than this
+                    return r;
             }
         }
         return null;
@@ -164,12 +147,12 @@ public final class BatchRun extends Actionable implements Executable, Comparable
      */
     public BatchRun getNext() {
         // check siblings
-        for( AbstractBuild<?,?> b=parent.owner; b!=null; b=b.getNextBuild()) {
+        for (AbstractBuild<?, ?> b = parent.owner; b != null; b = b.getNextBuild()) {
             BatchRunAction records = b.getAction(BatchRunAction.class);
-            if(records==null)   continue;
+            if (records == null) continue;
             for (BatchRun r : Iterators.reverse(records.records)) {
                 if (r.taskName.equals(taskName)
-                    && r.timestamp.compareTo(this.timestamp) > 0) // must be newer than this
+                        && r.timestamp.compareTo(this.timestamp) > 0) // must be newer than this
                     return r;
             }
         }
@@ -179,11 +162,10 @@ public final class BatchRun extends Actionable implements Executable, Comparable
     /**
      * Gets the URL (under the context root) that points to this record.
      *
-     * @return
-     *      URL like "job/foo/53/batchTasks/0"
+     * @return URL like "job/foo/53/batchTasks/0"
      */
     public String getUrl() {
-        return parent.owner.getUrl()+"batchTasks/"+id;
+        return parent.owner.getUrl() + "batchTasks/" + id;
     }
 
     public String getSearchUrl() {
@@ -191,23 +173,23 @@ public final class BatchRun extends Actionable implements Executable, Comparable
     }
 
     public String getDisplayName() {
-        return taskName+' '+getBuildNumber();
+        return taskName + ' ' + getBuildNumber();
     }
 
     public String getNumber() {
-        return parent.owner.getNumber()+"-"+id;
+        return parent.owner.getNumber() + "-" + id;
     }
 
     public String getBuildNumber() {
-        return "#"+parent.owner.getNumber()+'-'+id;
+        return "#" + parent.owner.getNumber() + '-' + id;
     }
 
     /**
      * Gets the string that says how long the build took to run.
      */
     public String getDurationString() {
-        if(isRunning())
-            return Util.getTimeSpanString(System.currentTimeMillis()-timestamp.getTimeInMillis())+" and counting";
+        if (isRunning())
+            return Util.getTimeSpanString(System.currentTimeMillis() - timestamp.getTimeInMillis()) + " and counting";
         return Util.getTimeSpanString(duration);
     }
 
@@ -220,7 +202,7 @@ public final class BatchRun extends Actionable implements Executable, Comparable
     }
 
     public void run() {
-        StreamBuildListener listener=null;
+        StreamBuildListener listener = null;
         try {
             long start = System.currentTimeMillis();
             listener = new StreamBuildListener(new FileOutputStream(getLogFile()));
@@ -228,59 +210,55 @@ public final class BatchRun extends Actionable implements Executable, Comparable
             Launcher launcher = node.createLauncher(listener);
 
             BatchTask task = getParent();
-            if (task==null)
-                throw new AbortException("ERROR: undefined task \""+taskName+"\"");
-            AbstractBuild<?,?> lb = task.owner.getLastBuild();
+            if (task == null)
+                throw new AbortException("ERROR: undefined task \"" + taskName + "\"");
+            AbstractBuild<?, ?> lb = task.owner.getLastBuild();
             FilePath ws = lb.getWorkspace();
-            if (ws==null)
-                throw new AbortException(lb.getFullDisplayName()+" doesn't have a workspace.");
+            if (ws == null)
+                throw new AbortException(lb.getFullDisplayName() + " doesn't have a workspace.");
 
             try {
-                // Copying some logic from AbstractBuild.AbstractRunner.createLauncher().
-                // buildEnvironments are discarded after the build runs, so we need to follow the
-                // same model here.. applying node properties, but leaving out build wrappers.
+
+                EnvVarsResolver envVarsResolver = new EnvVarsResolver();
                 final ArrayList<Environment> buildEnvironments = new ArrayList<Environment>();
-                for (NodeProperty nodeProperty : Jenkins.getInstance().getGlobalNodeProperties()) {
-                    Environment environment = nodeProperty.setUp(lb, launcher, listener);
-                    if (environment != null) buildEnvironments.add(environment);
-                }
-                for (NodeProperty nodeProperty : node.getNodeProperties()) {
-                    Environment environment = nodeProperty.setUp(lb, launcher, listener);
-                    if (environment != null) buildEnvironments.add(environment);
-                }
-                // Not sure if tasks should use all build wrappers (xvnc for example),
-                // but look for one in particular, from setenv plugin.
-                if (task.owner instanceof BuildableItemWithBuildWrappers)
-                    for (BuildWrapper bw : ((BuildableItemWithBuildWrappers)task.owner).getBuildWrappersList())
-                        if ("hudson.plugins.setenv.SetEnvBuildWrapper".equals(bw.getClass().getName())) {
-                            Environment environment = bw.setUp(lb, launcher, listener);
-                            if (environment != null) buildEnvironments.add(environment);
-                        }
+                buildEnvironments.add(Environment.create(new EnvVars(envVarsResolver.getEnVars(lb))));
+
 
                 // This is the only way I found to inject things into the environment of
                 // CommandInterpreter.perform().. temporarily attach an action to the build.
                 // (if BatchTask/BatchRun are converted to extend AbstractProject/AbstractBuild,
                 //  BatchRun will use AbstractRunner and get global/node properties w/o extra code)
                 EnvironmentContributingAction envAct = new EnvironmentContributingAction() {
-                    public void buildEnvVars(AbstractBuild<?,?> build, EnvVars env) {
+                    public void buildEnvVars(AbstractBuild<?, ?> build, EnvVars env) {
                         // Apply global and node properties
                         for (Environment e : buildEnvironments) e.buildEnvVars(env);
                         // Our task id
                         env.put("TASK_ID", getNumber());
                         // User who triggered this task run, if applicable
-                        out: for (CauseAction ca : getActions(CauseAction.class))
+                        out:
+                        for (CauseAction ca : getActions(CauseAction.class))
                             for (Cause c : ca.getCauses())
                                 if (c instanceof Cause.UserCause) {
-                                    env.put("HUDSON_USER", ((Cause.UserCause)c).getUserName());
+                                    env.put("HUDSON_USER", ((Cause.UserCause) c).getUserName());
                                     break out;
                                 }
                     }
-                    public String getDisplayName() { return null; }
-                    public String getIconFileName() { return null; }
-                    public String getUrlName() { return null; }
+
+                    public String getDisplayName() {
+                        return null;
+                    }
+
+                    public String getIconFileName() {
+                        return null;
+                    }
+
+                    public String getUrlName() {
+                        return null;
+                    }
                 };
 
                 CommandInterpreter batchRunner;
+
                 if (launcher.isUnix())
                     batchRunner = new Shell(task.script);
                 else
@@ -293,7 +271,7 @@ public final class BatchRun extends Actionable implements Executable, Comparable
                     // Add environment to build so it will apply when task runs
                     lb.getActions().add(envAct);
                     // Run the task
-                    result = batchRunner.perform(lb,launcher,listener) ? Result.SUCCESS : Result.FAILURE;
+                    result = batchRunner.perform(lb, launcher, listener) ? Result.SUCCESS : Result.FAILURE;
                 } finally {
                     if (wsLease != null) wsLease.release();
                     lb.getActions().remove(envAct);
@@ -302,8 +280,10 @@ public final class BatchRun extends Actionable implements Executable, Comparable
             } catch (InterruptedException e) {
                 listener.getLogger().println("ABORTED");
                 result = Result.ABORTED;
+            } catch (EnvInjectException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
-            duration = System.currentTimeMillis()-start;
+            duration = System.currentTimeMillis() - start;
 
             // save the build result
             parent.owner.save();
@@ -312,11 +292,11 @@ public final class BatchRun extends Actionable implements Executable, Comparable
             listener.error(e.getMessage());
         } catch (IOException e) {
             result = Result.FAILURE;
-            LOGGER.log(Level.SEVERE, "Failed to write "+getLogFile(),e);
+            LOGGER.log(Level.SEVERE, "Failed to write " + getLogFile(), e);
         } finally {
-            if(listener!=null)
+            if (listener != null)
                 listener.getLogger().close();
-            if (result==null)
+            if (result == null)
                 result = Result.FAILURE;
         }
     }
@@ -324,13 +304,14 @@ public final class BatchRun extends Actionable implements Executable, Comparable
     /**
      * Handles incremental log output.
      */
-    public void doProgressiveLog( StaplerRequest req, StaplerResponse rsp) throws IOException {
-        new LargeText(getLogFile(),!isRunning()).doProgressText(req,rsp);
+    public void doProgressiveLog(StaplerRequest req, StaplerResponse rsp) throws IOException {
+        new LargeText(getLogFile(), !isRunning()).doProgressText(req, rsp);
     }
 
     // used by the executors listing
-    @Override public String toString() {
-        return parent.owner.toString()+'-'+id;
+    @Override
+    public String toString() {
+        return parent.owner.toString() + '-' + id;
     }
 
     /**
@@ -339,7 +320,7 @@ public final class BatchRun extends Actionable implements Executable, Comparable
     public int compareTo(BatchRun that) {
         return that.timestamp.compareTo(this.timestamp);
     }
-    
+
     public long getEstimatedDuration() {
         return getParent().getEstimatedDuration();
     }

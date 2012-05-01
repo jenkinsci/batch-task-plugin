@@ -1,48 +1,57 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.jenkins-ci.plugins</groupId>
-    <artifactId>plugin</artifactId>
-    <version>1.424</version>
-  </parent>
-  
-  <artifactId>batch-task</artifactId>
-  <version>1.16-SNAPSHOT</version>
-  <packaging>hpi</packaging>
-  <name>Jenkins batch task plugin</name>
-  <url>http://wiki.jenkins-ci.org/display/JENKINS/Batch+Task+Plugin</url>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <developers>
-    <developer>
-      <id>kohsuke</id>
-      <name>Kohsuke Kawaguchi</name>
-    </developer>
-    <developer>
-      <id>mindless</id>
-      <name>Alan Harder</name>
-    </developer>
-  </developers>
-  
-  <build>
-  	<plugins>
-  		<plugin>
-  			<artifactId>maven-surefire-plugin</artifactId>
-  			<configuration>
-  				<!-- TODO: please remove this exclude, once the parent is updated to v1.385+ -->
-  				<excludes>
-  					<exclude>**/BatchRunTest.*</exclude>
-  				</excludes>
-  			</configuration>
-  		</plugin>
-  	</plugins>
-  </build>
+    <parent>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>1.424</version>
+    </parent>
 
-  <scm>
-    <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
-    <url>http://github.com/jenkinsci/${project.artifactId}-plugin</url>
-  </scm>
+    <artifactId>batch-task</artifactId>
+    <version>1.16-SNAPSHOT</version>
+    <packaging>hpi</packaging>
+    <name>Jenkins batch task plugin</name>
+    <url>http://wiki.jenkins-ci.org/display/JENKINS/Batch+Task+Plugin</url>
 
+    <developers>
+        <developer>
+            <id>kohsuke</id>
+            <name>Kohsuke Kawaguchi</name>
+        </developer>
+        <developer>
+            <id>mindless</id>
+            <name>Alan Harder</name>
+        </developer>
+    </developers>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- TODO: please remove this exclude, once the parent is updated to v1.385+ -->
+                    <excludes>
+                        <exclude>**/BatchRunTest.*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <scm>
+        <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
+        <url>http://github.com/jenkinsci/${project.artifactId}-plugin</url>
+    </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jenkins-ci.lib</groupId>
+            <artifactId>envinject-lib</artifactId>
+            <version>1.7</version>
+        </dependency>
+    </dependencies>
 
     <repositories>
         <repository>
@@ -57,6 +66,7 @@
             <url>http://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
+
 </project>  
   
 
