@@ -48,7 +48,7 @@
         <dependency>
             <groupId>org.jenkins-ci.lib</groupId>
             <artifactId>envinject-lib</artifactId>
-            <version>1.7</version>
+            <version>1.16</version>
         </dependency>
     </dependencies>
 
