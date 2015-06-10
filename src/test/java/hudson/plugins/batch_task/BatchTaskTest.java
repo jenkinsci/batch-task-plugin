@@ -33,21 +33,28 @@ import hudson.model.Queue;
 import hudson.model.Result;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
 import java.util.concurrent.TimeUnit;
-import org.jvnet.hudson.test.HudsonTestCase;
+import static org.junit.Assert.*;
+
+import org.junit.Assume;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
 
 /**
  * Tests for batch tasks plugin.
  * @author Alan Harder
  */
-public class BatchTaskTest extends HudsonTestCase {
-
+public class BatchTaskTest {
+    @Rule 
+    public JenkinsRule jenkinsRule = new JenkinsRule();
     /**
      * Verify redirect on attempt to run task when there are no builds.
      */
+    @Test
     public void testNoBuilds() throws Exception {
-        FreeStyleProject p = createFreeStyleProject();
+        FreeStyleProject p = jenkinsRule.createFreeStyleProject();
         p.addProperty(new BatchTaskProperty(new BatchTask("test", "echo hello")));
-        WebClient wc = new WebClient();
+        JenkinsRule.WebClient wc = jenkinsRule.createWebClient();
         HtmlPage page = wc.getPage(p, "batchTasks/task/test/execute");
         String path = page.getWebResponse().getUrl().getPath();
         assertTrue("should redirect to noBuilds page: " + path, path.endsWith("/noBuild"));
@@ -58,19 +65,20 @@ public class BatchTaskTest extends HudsonTestCase {
      *  TASK_ID for this run, global and node properties, HUDSON_USER if triggered
      *  by a user.
      */
+    @Test
     public void testExecute() throws Exception {
-        hudson.getGlobalNodeProperties().add(new EnvironmentVariablesNodeProperty(
+        jenkinsRule.jenkins.getGlobalNodeProperties().add(new EnvironmentVariablesNodeProperty(
                 new EnvironmentVariablesNodeProperty.Entry("GLOBAL", "global-property"),
                 new EnvironmentVariablesNodeProperty.Entry("OVERRIDE_ME", "foo")));
-        hudson.getNodeProperties().add(new EnvironmentVariablesNodeProperty(
+        jenkinsRule.jenkins.getNodeProperties().add(new EnvironmentVariablesNodeProperty(
                 new EnvironmentVariablesNodeProperty.Entry("OVERRIDE_ME", "bar")));
-        FreeStyleProject p = createFreeStyleProject("execute");
+        FreeStyleProject p = jenkinsRule.createFreeStyleProject("execute");
         BatchTask task = new BatchTask("test",
                 "echo \"$TASK_ID:$GLOBAL:$OVERRIDE_ME:$HUDSON_USER\"\n");
         p.addProperty(new BatchTaskProperty(task));
         p.scheduleBuild2(0).get();
-        new WebClient().getPage(p, "batchTasks/task/test/execute");
-        Queue.Item q = hudson.getQueue().getItem(task);
+        jenkinsRule.createWebClient().getPage(p, "batchTasks/task/test/execute");
+        Queue.Item q = jenkinsRule.jenkins.getQueue().getItem(task);
         if (q!=null) q.getFuture().get(5, TimeUnit.SECONDS);
         BatchRun run = task.getLastRun();
         assertNotNull("task did not run", run);
@@ -86,17 +94,18 @@ public class BatchTaskTest extends HudsonTestCase {
     /**
      * Verify UpstreamCause is added when a job triggers a task.
      */
+    @Test
     public void testInvoker() throws Exception {
-        FreeStyleProject p = createFreeStyleProject("tasker");
+        FreeStyleProject p = jenkinsRule.createFreeStyleProject("tasker");
         BatchTask task = new BatchTask("test", "echo hello\n");
         p.addProperty(new BatchTaskProperty(task));
         p.scheduleBuild2(0).get();
-        FreeStyleProject up = createFreeStyleProject("invoker");
+        FreeStyleProject up = jenkinsRule.createFreeStyleProject("invoker");
         up.getPublishersList().add(new BatchTaskInvoker(
                 new BatchTaskInvoker.Config[] { new BatchTaskInvoker.Config(p.getFullName(), "test") },
                 Result.SUCCESS));
         up.scheduleBuild2(0).get();
-        Queue.Item q = hudson.getQueue().getItem(task);
+        Queue.Item q = jenkinsRule.jenkins.getQueue().getItem(task);
         if (q!=null) q.getFuture().get(5, TimeUnit.SECONDS);
         BatchRun run = task.getLastRun();
         assertNotNull("task did not run", run);
