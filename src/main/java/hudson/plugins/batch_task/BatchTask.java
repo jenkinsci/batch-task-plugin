@@ -22,11 +22,14 @@ import hudson.widgets.HistoryWidget;
 import hudson.widgets.HistoryWidget.Adapter;
 import hudson.security.ACL;
 import jenkins.model.Jenkins;
+
+import org.acegisecurity.Authentication;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import javax.servlet.ServletException;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -377,5 +380,11 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
      */
     public Object getSameNodeConstraint() {
         return null;
+    }
+    
+    @Override
+    public Authentication getDefaultAuthentication() {
+      // TODO Auto-generated method stub
+      return null;
     }
 }
