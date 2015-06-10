@@ -67,6 +67,8 @@ public class BatchTaskTest {
      */
     @Test
     public void testExecute() throws Exception {
+         // This test only works on linux because of the shell syntax
+        Assume.assumeFalse(System.getProperty("os.name").toLowerCase().startsWith("win"));
         jenkinsRule.jenkins.getGlobalNodeProperties().add(new EnvironmentVariablesNodeProperty(
                 new EnvironmentVariablesNodeProperty.Entry("GLOBAL", "global-property"),
                 new EnvironmentVariablesNodeProperty.Entry("OVERRIDE_ME", "foo")));
