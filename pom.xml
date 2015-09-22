@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.424</version>
+        <version>1.580.3</version>
     </parent>
 
     <artifactId>batch-task</artifactId>
@@ -12,7 +12,12 @@
     <packaging>hpi</packaging>
     <name>Jenkins batch task plugin</name>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/Batch+Task+Plugin</url>
-
+    <properties>
+        <jenkins.version>1.580.3</jenkins.version>
+        <envinject-lib.version>1.21</envinject-lib.version>
+        <matrix-project.version>1.5</matrix-project.version>
+        <groovy.version>1.8.9</groovy.version>
+    </properties>
     <developers>
         <developer>
             <id>kohsuke</id>
@@ -36,6 +41,18 @@
                 </configuration>
             </plugin>
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                     <groupId>org.codehaus.gmaven</groupId>
+                     <artifactId>gmaven-plugin</artifactId>
+                     <version>1.5</version>
+                     <configuration>
+                       <providerSelection>1.8</providerSelection>
+                     </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <scm>
@@ -43,12 +60,39 @@
         <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
         <url>http://github.com/jenkinsci/${project.artifactId}-plugin</url>
     </scm>
+    
+    <dependencyManagement>
+      <dependencies>
+      <dependency>
+        <groupId>org.codehaus.gmaven.runtime</groupId>
+        <artifactId>gmaven-runtime-1.8</artifactId>
+        <version>1.5</version>
+      </dependency>
+      
+      <dependency>
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-all</artifactId>
+          <version>${groovy.version}</version>
+        </dependency>
+      </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>org.jenkins-ci.lib</groupId>
             <artifactId>envinject-lib</artifactId>
-            <version>1.16</version>
+            <version>${envinject-lib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>matrix-project</artifactId>
+            <version>${matrix-project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.main</groupId>
+            <artifactId>jenkins-test-harness</artifactId>
+            <version>${jenkins.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
