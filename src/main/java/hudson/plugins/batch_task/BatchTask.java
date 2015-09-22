@@ -384,7 +384,6 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
     
     @Override
     public Authentication getDefaultAuthentication() {
-      // TODO Auto-generated method stub
-      return null;
+    	return ACL.SYSTEM;
     }
 }
