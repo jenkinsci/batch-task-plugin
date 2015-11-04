@@ -72,7 +72,8 @@ public class BatchTaskTest extends HudsonTestCase {
         BatchTask task;
         if (Functions.isWindows()) {
             task = new BatchTask("test",
-                    "echo \"%TASK_ID%:%GLOBAL%:%OVERRIDE_ME%:%HUDSON_USER%\"");        }
+                    "echo \"%TASK_ID%:%GLOBAL%:%OVERRIDE_ME%:%HUDSON_USER%\"");
+        }
         else {
             task = new BatchTask("test",
                     "echo \"$TASK_ID:$GLOBAL:$OVERRIDE_ME:$HUDSON_USER\"\n");
