@@ -24,6 +24,8 @@
 package hudson.plugins.batch_task;
 
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+
+import hudson.Functions;
 import hudson.Util;
 import hudson.model.Cause.UpstreamCause;
 import hudson.model.Cause.UserCause;
@@ -32,7 +34,9 @@ import hudson.model.FreeStyleProject;
 import hudson.model.Queue;
 import hudson.model.Result;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
+
 import java.util.concurrent.TimeUnit;
+
 import org.jvnet.hudson.test.HudsonTestCase;
 
 /**
@@ -65,8 +69,15 @@ public class BatchTaskTest extends HudsonTestCase {
         hudson.getNodeProperties().add(new EnvironmentVariablesNodeProperty(
                 new EnvironmentVariablesNodeProperty.Entry("OVERRIDE_ME", "bar")));
         FreeStyleProject p = createFreeStyleProject("execute");
-        BatchTask task = new BatchTask("test",
-                "echo \"$TASK_ID:$GLOBAL:$OVERRIDE_ME:$HUDSON_USER\"\n");
+        BatchTask task;
+        if (Functions.isWindows()) {
+            task = new BatchTask("test",
+                    "echo \"%TASK_ID%:%GLOBAL%:%OVERRIDE_ME%:%HUDSON_USER%\"");
+        }
+        else {
+            task = new BatchTask("test",
+                    "echo \"$TASK_ID:$GLOBAL:$OVERRIDE_ME:$HUDSON_USER\"\n");
+        }
         p.addProperty(new BatchTaskProperty(task));
         p.scheduleBuild2(0).get();
         new WebClient().getPage(p, "batchTasks/task/test/execute");
