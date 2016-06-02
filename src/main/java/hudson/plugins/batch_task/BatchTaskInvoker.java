@@ -10,6 +10,7 @@ import hudson.model.BuildListener;
 import hudson.model.Cause.UpstreamCause;
 import hudson.model.CauseAction;
 import hudson.model.Descriptor;
+import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.Result;
 import hudson.model.Run;
@@ -17,9 +18,12 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
+import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -138,6 +142,29 @@ public class BatchTaskInvoker extends Notifier {
                     }
                 }
                 return r;
+            }
+
+            @Restricted(NoExternalUse.class)
+            public FormValidation doCheckProject(@QueryParameter String project) {
+                if (project.startsWith("/")) {
+                    return FormValidation.warning(Messages.BatchTaskInvoker_ForwardSlash());
+                }
+                Jenkins jenkins = Jenkins.getInstance();
+                if (jenkins != null) {
+                    Item item = jenkins.getItemByFullName(project);
+                    if (item == null) {
+                        return FormValidation.warning(Messages.BatchTaskInvoker_NoSuchProject(project));
+                    }
+                }
+                return FormValidation.ok();
+            }
+
+            @Restricted(NoExternalUse.class)
+            public FormValidation doCheckTask(@QueryParameter String project, @QueryParameter String task) {
+                if (!project.isEmpty() && task.isEmpty()) {
+                    return FormValidation.warning(Messages.BatchTaskInvoker_NoBatchTaskExists(task));
+                }
+                return FormValidation.ok();
             }
         }
     }
