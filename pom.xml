@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>batch-task</artifactId>
-    <version>1.18</version>
+    <version>1.19-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>Jenkins batch task plugin</name>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/Batch+Task+Plugin</url>
@@ -35,7 +35,7 @@
         <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
         <url>http://github.com/jenkinsci/${project.artifactId}-plugin</url>
-      <tag>batch-task-1.18</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <dependencies>
