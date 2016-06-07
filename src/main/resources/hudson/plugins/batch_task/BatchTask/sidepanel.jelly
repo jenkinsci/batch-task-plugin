@@ -1,6 +1,7 @@
 <!--
   Side panel for the tasks.
 -->
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:header>
     <link rel="alternate" title="Hudson:${it.fullDisplayName} (all runs)" href="rssAll" type="application/rss+xml" />

@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.424</version>
+        <version>2.9</version>
     </parent>
 
     <artifactId>batch-task</artifactId>
@@ -12,6 +12,13 @@
     <packaging>hpi</packaging>
     <name>Jenkins batch task plugin</name>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/Batch+Task+Plugin</url>
+
+    <properties>
+        <jenkins.version>1.580.1</jenkins.version>
+        <java.level>6</java.level>
+        <powermock.version>1.6.1</powermock.version>
+        <findbugs.failOnError>false</findbugs.failOnError>
+    </properties>
 
     <developers>
         <developer>
@@ -24,20 +31,6 @@
         </developer>
     </developers>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <!-- TODO: please remove this exclude, once the parent is updated to v1.385+ -->
-                    <excludes>
-                        <exclude>**/BatchRunTest.*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <scm>
         <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
@@ -48,21 +41,27 @@
         <dependency>
             <groupId>org.jenkins-ci.lib</groupId>
             <artifactId>envinject-lib</artifactId>
-            <version>1.16</version>
+            <version>1.23</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>matrix-project</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <repositories>
         <repository>
             <id>repo.jenkins-ci.org</id>
-            <url>http://repo.jenkins-ci.org/public/</url>
+            <url>https://repo.jenkins-ci.org/public/</url>
         </repository>
     </repositories>
 
     <pluginRepositories>
         <pluginRepository>
             <id>repo.jenkins-ci.org</id>
-            <url>http://repo.jenkins-ci.org/public/</url>
+            <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
 

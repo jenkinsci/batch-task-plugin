@@ -22,10 +22,12 @@ import hudson.widgets.HistoryWidget;
 import hudson.widgets.HistoryWidget.Adapter;
 import hudson.security.ACL;
 import jenkins.model.Jenkins;
+import org.acegisecurity.Authentication;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
+import javax.annotation.Nonnull;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Collection;
@@ -363,6 +365,13 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task {
      */
     public Collection<? extends SubTask> getSubTasks() {
         return Collections.singleton(this);
+    }
+
+    /** {@inheritDoc} */
+    @Nonnull
+    @Override
+    public Authentication getDefaultAuthentication() {
+        return ACL.SYSTEM;
     }
 
     /**

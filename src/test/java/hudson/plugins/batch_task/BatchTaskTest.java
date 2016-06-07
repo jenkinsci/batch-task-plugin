@@ -30,30 +30,38 @@ import hudson.Util;
 import hudson.model.Cause.UpstreamCause;
 import hudson.model.Cause.UserCause;
 import hudson.model.CauseAction;
+import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Queue;
 import hudson.model.Result;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import static org.junit.Assert.*;
 
 import java.util.concurrent.TimeUnit;
 
-import org.jvnet.hudson.test.HudsonTestCase;
 
 /**
  * Tests for batch tasks plugin.
  * @author Alan Harder
  */
-public class BatchTaskTest extends HudsonTestCase {
+public class BatchTaskTest {
+
+    @Rule
+    public JenkinsRule r = new JenkinsRule();
 
     /**
      * Verify redirect on attempt to run task when there are no builds.
      */
+    @Test
     public void testNoBuilds() throws Exception {
-        FreeStyleProject p = createFreeStyleProject();
+        FreeStyleProject p = r.createFreeStyleProject();
         p.addProperty(new BatchTaskProperty(new BatchTask("test", "echo hello")));
-        WebClient wc = new WebClient();
+        JenkinsRule.WebClient wc = r.createWebClient();
         HtmlPage page = wc.getPage(p, "batchTasks/task/test/execute");
-        String path = page.getWebResponse().getUrl().getPath();
+        String path = page.getWebResponse().getWebRequest().getUrl().getPath();
         assertTrue("should redirect to noBuilds page: " + path, path.endsWith("/noBuild"));
     }
 
@@ -62,13 +70,15 @@ public class BatchTaskTest extends HudsonTestCase {
      *  TASK_ID for this run, global and node properties, HUDSON_USER if triggered
      *  by a user.
      */
+    @Test
     public void testExecute() throws Exception {
-        hudson.getGlobalNodeProperties().add(new EnvironmentVariablesNodeProperty(
+
+        r.jenkins.getGlobalNodeProperties().add(new EnvironmentVariablesNodeProperty(
                 new EnvironmentVariablesNodeProperty.Entry("GLOBAL", "global-property"),
                 new EnvironmentVariablesNodeProperty.Entry("OVERRIDE_ME", "foo")));
-        hudson.getNodeProperties().add(new EnvironmentVariablesNodeProperty(
+        r.jenkins.getNodeProperties().add(new EnvironmentVariablesNodeProperty(
                 new EnvironmentVariablesNodeProperty.Entry("OVERRIDE_ME", "bar")));
-        FreeStyleProject p = createFreeStyleProject("execute");
+        FreeStyleProject p = r.createFreeStyleProject("execute");
         BatchTask task;
         if (Functions.isWindows()) {
             task = new BatchTask("test",
@@ -79,10 +89,12 @@ public class BatchTaskTest extends HudsonTestCase {
                     "echo \"$TASK_ID:$GLOBAL:$OVERRIDE_ME:$HUDSON_USER\"\n");
         }
         p.addProperty(new BatchTaskProperty(task));
-        p.scheduleBuild2(0).get();
-        new WebClient().getPage(p, "batchTasks/task/test/execute");
-        Queue.Item q = hudson.getQueue().getItem(task);
-        if (q!=null) q.getFuture().get(5, TimeUnit.SECONDS);
+        p.scheduleBuild2(0);
+        FreeStyleBuild freeStyleBuild = p.scheduleBuild2(0).get();
+        while (freeStyleBuild.isBuilding()) {
+            Thread.sleep(100);
+        }
+        r.createWebClient().getPage(p, "batchTasks/task/test/execute");
         BatchRun run = task.getLastRun();
         assertNotNull("task did not run", run);
         CauseAction ca = run.getAction(CauseAction.class);
@@ -97,17 +109,18 @@ public class BatchTaskTest extends HudsonTestCase {
     /**
      * Verify UpstreamCause is added when a job triggers a task.
      */
+    @Test
     public void testInvoker() throws Exception {
-        FreeStyleProject p = createFreeStyleProject("tasker");
+        FreeStyleProject p = r.createFreeStyleProject("tasker");
         BatchTask task = new BatchTask("test", "echo hello\n");
         p.addProperty(new BatchTaskProperty(task));
         p.scheduleBuild2(0).get();
-        FreeStyleProject up = createFreeStyleProject("invoker");
+        FreeStyleProject up = r.createFreeStyleProject("invoker");
         up.getPublishersList().add(new BatchTaskInvoker(
                 new BatchTaskInvoker.Config[] { new BatchTaskInvoker.Config(p.getFullName(), "test") },
                 Result.SUCCESS));
         up.scheduleBuild2(0).get();
-        Queue.Item q = hudson.getQueue().getItem(task);
+        Queue.Item q = r.jenkins.getQueue().getItem(task);
         if (q!=null) q.getFuture().get(5, TimeUnit.SECONDS);
         BatchRun run = task.getLastRun();
         assertNotNull("task did not run", run);
