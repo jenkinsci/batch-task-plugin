@@ -1,3 +1,4 @@
+<?jelly escape-by-default='true'?>
 <div>
   This plugin adds the "task" action to the project for performing batch tasks on the server workspace.
 </div>
