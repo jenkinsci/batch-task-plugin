@@ -2,7 +2,7 @@
 Batch Task Plugin
 =====================
 
-The Batch Task Jenkins plugin adds batch tasks to jenkins jobs that are not regularly executed to projects, such as releases, integration, archiving, etc. In this way, anyone in the project team can execute them in a way that leaves a record.
+The Batch Task Jenkins plugin adds batch tasks to [Jenkins](https://jenkins.io/) jobs. Batch tasks are useful for tasks that are not regularly executed, such as releases, integration, archiving, etc. In this way, anyone in the project team can execute them in a way that leaves a record.
 
 How To Use
 ----------
