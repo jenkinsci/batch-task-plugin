@@ -1,5 +1,6 @@
 package hudson.plugins.batch_task;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
@@ -107,8 +108,8 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
         }
 
         @Override
-        public BatchTaskProperty newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-            if(req.getParameter("batch-tasks.on")!=null)
+        public BatchTaskProperty newInstance(@Nullable StaplerRequest req, JSONObject formData) throws FormException {
+            if(req != null && req.getParameter("batch-tasks.on")!=null)
                 return new BatchTaskProperty(req.bindParametersToList(BatchTask.class, "batch-task."));
             else
                 return null;

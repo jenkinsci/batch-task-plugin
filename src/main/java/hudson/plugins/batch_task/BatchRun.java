@@ -1,5 +1,6 @@
 package hudson.plugins.batch_task;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.*;
 import hudson.model.*;
 import hudson.model.Queue.Executable;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -91,9 +93,9 @@ public final class BatchRun extends Actionable implements Executable, Comparable
         return new File(parent.owner.getRootDir(), "task-" + id + ".log");
     }
 
+    @NonNull
     public BatchTask getParent() {
         BatchTaskAction jta = parent.owner.getProject().getAction(BatchTaskAction.class);
-        if (jta == null) return null;
         return jta.getTask(taskName);
     }
 
@@ -206,13 +208,21 @@ public final class BatchRun extends Actionable implements Executable, Comparable
         try {
             long start = System.currentTimeMillis();
             listener = new StreamBuildListener(new FileOutputStream(getLogFile()));
-            Node node = Executor.currentExecutor().getOwner().getNode();
+            Executor executor = Executor.currentExecutor();
+            if (executor == null)
+                throw new AbortException("ERROR: no executor");
+            Node node = executor.getOwner().getNode();
+            if (node == null)
+                throw new AbortException("ERROR: no node present");
+
             Launcher launcher = node.createLauncher(listener);
 
             BatchTask task = getParent();
             if (task == null)
                 throw new AbortException("ERROR: undefined task \"" + taskName + "\"");
             AbstractBuild<?, ?> lb = task.owner.getLastBuild();
+            if (lb == null)
+                throw new AbortException("ERROR: task \"" + taskName + "\" doesn't have a last build");
             FilePath ws = lb.getWorkspace();
             if (ws == null)
                 throw new AbortException(lb.getFullDisplayName() + " doesn't have a workspace.");
@@ -266,7 +276,14 @@ public final class BatchRun extends Actionable implements Executable, Comparable
                 Lease wsLease = null;
                 try {
                     // Lock the workspace
-                    wsLease = lb.getBuiltOn().toComputer().getWorkspaceList().acquire(ws,
+                    Node builtOn = lb.getBuiltOn();
+                    if (builtOn == null)
+                        throw new AbortException("ERROR: no node for last build");
+                    Computer computer = builtOn.toComputer();
+                    if (computer == null)
+                        throw new AbortException("ERROR: no computer");
+
+                    wsLease = computer.getWorkspaceList().acquire(ws,
                             !task.owner.isConcurrentBuild());
                     // Add environment to build so it will apply when task runs
                     lb.getActions().add(envAct);
@@ -319,6 +336,19 @@ public final class BatchRun extends Actionable implements Executable, Comparable
      */
     public int compareTo(BatchRun that) {
         return that.timestamp.compareTo(this.timestamp);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BatchRun batchRun = (BatchRun) o;
+        return id == batchRun.id && duration == batchRun.duration && Objects.equals(result, batchRun.result) && Objects.equals(timestamp, batchRun.timestamp) && Objects.equals(parent, batchRun.parent) && Objects.equals(taskName, batchRun.taskName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(result, timestamp, parent, id, taskName, duration);
     }
 
     public long getEstimatedDuration() {
