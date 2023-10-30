@@ -23,7 +23,7 @@
  */
 package hudson.plugins.batch_task;
 
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.htmlunit.html.HtmlPage;
 
 import hudson.Functions;
 import hudson.Util;
