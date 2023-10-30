@@ -27,6 +27,7 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -147,6 +148,7 @@ public class BatchTaskInvoker extends Notifier {
             }
 
             @Restricted(NoExternalUse.class)
+            @POST
             public FormValidation doCheckProject(@QueryParameter String project) {
                 if (project.startsWith("/")) {
                     return FormValidation.warning(Messages.BatchTaskInvoker_ForwardSlash());
@@ -162,6 +164,7 @@ public class BatchTaskInvoker extends Notifier {
             }
 
             @Restricted(NoExternalUse.class)
+            @POST
             public FormValidation doCheckTask(@QueryParameter String project, @QueryParameter String task) {
                 if (!project.isEmpty() && task.isEmpty()) {
                     return FormValidation.warning(Messages.BatchTaskInvoker_NoBatchTaskExists(task));
