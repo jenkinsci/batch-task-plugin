@@ -16,6 +16,7 @@ import hudson.model.Result;
 import hudson.model.Job;
 import hudson.model.queue.CauseOfBlockage;
 import hudson.model.queue.SubTask;
+import hudson.security.AccessControlled;
 import hudson.util.Iterators;
 import hudson.widgets.BuildHistoryWidget;
 import hudson.widgets.HistoryWidget;
@@ -44,7 +45,7 @@ import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
  * 
  * @author Kohsuke Kawaguchi
  */
-public final class BatchTask extends AbstractModelObject implements Queue.Task {
+public final class BatchTask extends AbstractModelObject implements Queue.Task, AccessControlled {
     /**
      * Name of this task. Used for display.
      */
