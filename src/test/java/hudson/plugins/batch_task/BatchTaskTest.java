@@ -102,8 +102,8 @@ public class BatchTaskTest {
         assertEquals("Cause type", UserCause.class.getName(),
                 ca.getCauses().get(0).getClass().getName());
         String log = Util.loadFile(run.getLogFile());
-        assertTrue("Expected 1-1:global-property:bar:anonymous in task output: " + log,
-                log.contains("1-1:global-property:bar:anonymous"));
+        assertTrue("Expected 2-1:global-property:bar:anonymous in task output: " + log,
+                log.contains("2-1:global-property:bar:anonymous"));
     }
 
     /**
