@@ -89,7 +89,6 @@ public class BatchTaskTest {
                     "echo \"$TASK_ID:$GLOBAL:$OVERRIDE_ME:$HUDSON_USER\"\n");
         }
         p.addProperty(new BatchTaskProperty(task));
-        p.scheduleBuild2(0);
         FreeStyleBuild freeStyleBuild = p.scheduleBuild2(0).get();
         while (freeStyleBuild.isBuilding()) {
             Thread.sleep(100);
@@ -102,8 +101,8 @@ public class BatchTaskTest {
         assertEquals("Cause type", UserCause.class.getName(),
                 ca.getCauses().get(0).getClass().getName());
         String log = Util.loadFile(run.getLogFile());
-        assertTrue("Expected 2-1:global-property:bar:anonymous in task output: " + log,
-                log.contains("2-1:global-property:bar:anonymous"));
+        assertTrue("Expected 1-1:global-property:bar:anonymous in task output: " + log,
+                log.contains("1-1:global-property:bar:anonymous"));
     }
 
     /**
