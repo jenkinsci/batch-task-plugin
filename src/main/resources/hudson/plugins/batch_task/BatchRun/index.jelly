@@ -4,21 +4,23 @@
   can be inspired by https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/hudson/model/Run/console.jelly
 -->
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:p="/lib/hudson/project">
   <l:layout title="${%title(it.displayName)}" norefresh="true">
     <l:header />
     <l:side-panel>
       <l:tasks>
         <l:task icon="images/24x24/up.gif" href="../" title="${%Back to List}" />
-        <l:task icon="images/24x24/terminal.gif" href="${request.originalRequestURI}" title="${%Console}" />
+        <p:console-link/>
+        <!--l:task icon="images/24x24/terminal.gif" href="${request.originalRequestURI}" title="${%Console}" /-->
         <j:set var="isRunPath" value="${request.findAncestor(it.owner)!=null}" />
+
         <j:set var="p" value="${it.previous}" />
         <j:if test="${p!=null}">
-          <l:task icon="images/24x24/previous.gif" href="${isRunPath?rootURL+'/'+p.url:'../'+p.number}/" title="${%Previous}" />
+          <l:task contextMenu="false" href="${isRunPath?rootURL+'/'+p.url:'../'+p.number}/" icon="icon-previous icon-md" title="${%Previous}"/>
         </j:if>
         <j:set var="n" value="${it.next}" />
         <j:if test="${n!=null}">
-          <l:task icon="images/24x24/next.gif" href="${isRunPath?rootURL+'/'+n.url:'../'+n.number}/" title="${%Next}" />
+          <l:task contextMenu="false" href="${isRunPath?rootURL+'/'+n.url:'../'+n.number}/" icon="icon-next icon-md" title="${%Next}"/>
         </j:if>
       </l:tasks>
     </l:side-panel>
