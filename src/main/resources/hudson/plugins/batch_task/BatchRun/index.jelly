@@ -9,9 +9,8 @@
     <l:header />
     <l:side-panel>
       <l:tasks>
-        <l:task icon="images/24x24/up.gif" href="../" title="${%Back to List}" />
-        <p:console-link/>
-        <!--l:task icon="images/24x24/terminal.gif" href="${request.originalRequestURI}" title="${%Console}" /-->
+        <l:task icon="icon-up icon-md" href="../" title="${%Back to List}" />
+        <l:task icon="icon-terminal icon-md" href="${request.originalRequestURI}" title="${%Console}" />
         <j:set var="isRunPath" value="${request.findAncestor(it.owner)!=null}" />
 
         <j:set var="p" value="${it.previous}" />
