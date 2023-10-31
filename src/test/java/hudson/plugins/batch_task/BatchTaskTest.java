@@ -23,7 +23,7 @@
  */
 package hudson.plugins.batch_task;
 
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.htmlunit.html.HtmlPage;
 
 import hudson.Functions;
 import hudson.Util;
@@ -89,7 +89,6 @@ public class BatchTaskTest {
                     "echo \"$TASK_ID:$GLOBAL:$OVERRIDE_ME:$HUDSON_USER\"\n");
         }
         p.addProperty(new BatchTaskProperty(task));
-        p.scheduleBuild2(0);
         FreeStyleBuild freeStyleBuild = p.scheduleBuild2(0).get();
         while (freeStyleBuild.isBuilding()) {
             Thread.sleep(100);
