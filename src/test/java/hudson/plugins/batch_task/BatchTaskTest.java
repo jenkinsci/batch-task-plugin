@@ -57,10 +57,11 @@ public class BatchTaskTest {
      */
     @Test
     public void testNoBuilds() throws Exception {
+        r.jenkins.setCrumbIssuer(null); //Not really testing csrf right now
         FreeStyleProject p = r.createFreeStyleProject();
         p.addProperty(new BatchTaskProperty(new BatchTask("test", "echo hello")));
         JenkinsRule.WebClient wc = r.createWebClient();
-        HtmlPage page = wc.getPage(p, "batchTasks/task/test/execute");
+        HtmlPage page = TestHelper.post(wc, p.getUrl() + "batchTasks/task/test/execute", null, null);
         String path = page.getWebResponse().getWebRequest().getUrl().getPath();
         assertTrue("should redirect to noBuilds page: " + path, path.endsWith("/noBuild"));
     }
@@ -72,7 +73,7 @@ public class BatchTaskTest {
      */
     @Test
     public void testExecute() throws Exception {
-
+        r.jenkins.setCrumbIssuer(null); //Not really testing csrf right now
         r.jenkins.getGlobalNodeProperties().add(new EnvironmentVariablesNodeProperty(
                 new EnvironmentVariablesNodeProperty.Entry("GLOBAL", "global-property"),
                 new EnvironmentVariablesNodeProperty.Entry("OVERRIDE_ME", "foo")));
@@ -93,7 +94,7 @@ public class BatchTaskTest {
         while (freeStyleBuild.isBuilding()) {
             Thread.sleep(100);
         }
-        r.createWebClient().getPage(p, "batchTasks/task/test/execute");
+        TestHelper.post(r.createWebClient(), p.getUrl() + "batchTasks/task/test/execute", null, null);
         BatchRun run = task.getLastRun();
         assertNotNull("task did not run", run);
         CauseAction ca = run.getAction(CauseAction.class);
