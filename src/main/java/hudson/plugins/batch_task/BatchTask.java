@@ -39,6 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+import org.kohsuke.stapler.verb.POST;
 
 /**
  * A batch task.
@@ -264,6 +265,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task, 
     /**
      * Schedules the execution
      */
+    @POST
     public synchronized void doExecute( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
         getACL().checkPermission(AbstractProject.BUILD);
 
@@ -278,6 +280,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task, 
     /**
      * Deletes this task.
      */
+    @POST
     public synchronized void doDoDelete(StaplerResponse rsp) throws IOException, ServletException {
         getACL().checkPermission(AbstractProject.DELETE);
         
@@ -319,6 +322,7 @@ public final class BatchTask extends AbstractModelObject implements Queue.Task, 
 
     private static final Pattern BUILD_NUMBER_PATTERN = Pattern.compile("(\\d+)-(\\d+)");
 
+    @POST
 	public void doCancelQueue(StaplerRequest req, StaplerResponse rsp)
 			throws IOException, ServletException {
         checkAbortPermission();

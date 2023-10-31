@@ -132,6 +132,7 @@ public class BatchTaskInvoker extends Notifier {
                 return "";
             }
 
+            @POST
             public ListBoxModel doFillTaskItems(@QueryParameter String project, @AncestorInPath AbstractProject context) {
                 // when the item is not found, the user should be getting an error from elsewhere.
                 ListBoxModel r = new ListBoxModel();
