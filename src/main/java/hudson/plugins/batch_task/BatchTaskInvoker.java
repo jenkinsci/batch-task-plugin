@@ -78,6 +78,7 @@ public class BatchTaskInvoker extends Notifier {
         /**
          * @deprecated as of 1.15
          */
+        @Deprecated
         public BatchTask resolve() {
             return resolve(Jenkins.getInstance());
         }
@@ -85,6 +86,7 @@ public class BatchTaskInvoker extends Notifier {
         /**
          * @deprecated as of 1.15
          */
+        @Deprecated
         public BatchTaskProperty resolveProperty() {
             return resolveProperty(null);
         }
