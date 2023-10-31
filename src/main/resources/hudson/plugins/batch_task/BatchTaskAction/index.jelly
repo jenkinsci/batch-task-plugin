@@ -53,9 +53,24 @@
             </td>
             <td>
               <j:if test="${t.hasBuildPermission()}">
-                <form action="${t.name}/execute" method="post">
-                  <input type="image" src="${rootURL}/images/${iconSize}/clock.gif" tooltip="${%Execute}" />
-                </form>
+
+                <j:set var="id" value="${h.generateId()}"/>
+                <l:task href="${t.name}/execute" icon="icon-clock icon-md" onclick="${it.parameterized?null:'return build_' + id + '(this)'}" permission="${it.BUILD}" post="${!it.parameterized}" title="${%Execute}"/>
+                <script>
+                    function build_${id}(a) {
+                        fetch(a.href, {
+                          method: 'post',
+                          headers: crumb.wrap({}),
+                        })
+                        hoverNotification('${%Task scheduled}',a.parentNode);
+                        return false;
+                    }
+                </script>
+
+
+                <!--form action="${t.name}/execute" method="post">
+                  <input type="image" icon="icon-clock icon-md" tooltip="${%Execute}" />
+                </form-->
               </j:if>
             </td>
             <td></td>
