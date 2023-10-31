@@ -202,9 +202,14 @@ public class BatchTaskInvoker extends Notifier {
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         HashSet<String> seenJobs = new HashSet<String>();
-        if (build.getResult().isBetterOrEqualTo(threshold)) {
-            for (Config config : configs)
-                config.invoke(build, listener, seenJobs);
+        if (build != null) {
+            Result result = build.getResult();
+            if (result != null) {
+                if (result.isBetterOrEqualTo(threshold)) {
+                    for (Config config : configs)
+                        config.invoke(build, listener, seenJobs);
+                }
+            }
         }
         return true;
     }
