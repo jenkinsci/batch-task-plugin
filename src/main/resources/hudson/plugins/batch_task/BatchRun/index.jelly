@@ -1,5 +1,7 @@
 <!--
   Displays the execution log
+
+  can be inspired by https://github.com/jenkinsci/jenkins/blob/master/core/src/main/resources/hudson/model/Run/console.jelly
 -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
@@ -22,16 +24,15 @@
     </l:side-panel>
     <l:main-panel>
       <h1>
-        <img src="${rootURL}/images/48x48/${it.buildStatusUrl}" width="48" height="48" alt="${it.iconColor.description}" />
-        ${%title(it.taskName)}
+          <t:buildCaption it="${it}">${%title(it.taskName)}</t:buildCaption>
       </h1>
 
       <j:choose>
         <!-- Do progressive console output -->
-        <j:when test="${it.running}">
-          <pre id="out"></pre>
+        <j:when test="${it.isLogUpdated()}">
+          <pre id="out" class="console-output"></pre>
           <div id="spinner">
-            <img src="${rootURL}/images/spinner.gif" />
+            <l:progressAnimation/>
           </div>
           <t:progressiveText href="progressiveLog" idref="out" spinner="spinner" />
         </j:when>
