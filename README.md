@@ -6,4 +6,4 @@ The Batch Task Jenkins plugin adds batch tasks to [Jenkins](https://jenkins.io/)
 
 How To Use
 ----------
-See plugin wiki at https://wiki.jenkins-ci.org/display/JENKINS/Batch+Task+Plugin
+See plugin wiki at https://plugins.jenkins.io/batch-task/
