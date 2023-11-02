@@ -4,7 +4,6 @@ import org.htmlunit.FailingHttpStatusCodeException;
 import org.htmlunit.HttpMethod;
 import org.htmlunit.WebRequest;
 import org.htmlunit.html.HtmlPage;
-import org.htmlunit.util.UrlUtils;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import java.io.IOException;
@@ -20,18 +19,19 @@ public class TestHelper {
      * @param webClient the client
      * @param relative the url relative to the context path
      * @param expectedContentType if expecting specific content type or null if not
-     * @param expectedStatus if expecting a failing http status code or null if not
+     * @param expectedStatus if expecting a http status code or null if not
      * @throws IOException if so
      */
-    public static HtmlPage post(JenkinsRule.WebClient webClient, String relative,
-                             String expectedContentType, Integer expectedStatus) throws IOException {
-        WebRequest request = new WebRequest(
-                UrlUtils.toUrlUnsafe(webClient.getContextPath() + relative),
-                HttpMethod.POST);
+    public static HtmlPage assertPost(JenkinsRule.WebClient webClient, String relative,
+                                      String expectedContentType, Integer expectedStatus) throws IOException {
+        WebRequest request = new WebRequest(webClient.createCrumbedUrl(relative), HttpMethod.POST);
         try {
             HtmlPage p = webClient.getPage(request);
             if (expectedContentType != null) {
                 assertThat(p.getWebResponse().getContentType(), is(expectedContentType));
+            }
+            if (expectedStatus != null) {
+                assertEquals(expectedStatus.intValue(), p.getWebResponse().getStatusCode());
             }
             return p;
         } catch (FailingHttpStatusCodeException e) {
