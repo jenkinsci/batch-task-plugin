@@ -327,7 +327,6 @@ public final class BatchRun extends Actionable implements Executable, Comparable
     /**
      * Handles incremental log output.
      */
-    @POST
     public void doProgressiveLog(StaplerRequest req, StaplerResponse rsp) throws IOException {
         new LargeText(getLogFile(), !isRunning()).doProgressText(req, rsp);
     }
