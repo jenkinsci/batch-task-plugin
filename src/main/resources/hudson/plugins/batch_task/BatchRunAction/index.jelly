@@ -8,7 +8,7 @@
         <j:forEach var="r" items="${it.records}">
           <tr>
             <td>
-              <img src="${rootURL}/images/32x32/${r.buildStatusUrl}" alt="${r.iconColor.description}" />
+              <t:ballColorTd it="${r.iconColor}" />
             </td><td>
               <a href="${r.id}/">${r.displayName} (${r.timestampString} ago)</a>
             </td>

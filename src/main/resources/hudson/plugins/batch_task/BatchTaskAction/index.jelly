@@ -20,7 +20,7 @@
     <l:main-panel>
       <h1>${%Batch Tasks}</h1>
       <t:setIconSize/>
-      <table class="sortable pane bigtable" id="projectstatus">
+      <table class="jenkins-table sortable" id="projectstatus">
         <tr>
           <th style="padding-left:1.5em">${%S}</th>
           <th initialSortDir="down">${%Task}</th>
@@ -52,11 +52,7 @@
               </j:choose>
             </td>
             <td>
-              <j:if test="${t.hasBuildPermission()}">
-                <form action="${t.name}/execute" method="post">
-                  <input type="image" src="${rootURL}/images/${iconSize}/clock.gif" tooltip="${%Execute}" />
-                </form>
-              </j:if>
+              <l:task href="${t.name}/execute" icon="icon-clock icon-md" permission="${it.BUILD}" post="${!it.parameterized}" title=""/> <!-- tooltip ${%Execute} -->
             </td>
             <td></td>
           </tr>
