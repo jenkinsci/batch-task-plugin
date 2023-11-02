@@ -9,6 +9,7 @@ import hudson.tasks.BatchFile;
 import hudson.tasks.CommandInterpreter;
 import hudson.tasks.Shell;
 import hudson.util.Iterators;
+
 import org.jenkinsci.lib.envinject.EnvInjectException;
 import org.jenkinsci.lib.envinject.service.EnvVarsResolver;
 import org.kohsuke.stapler.StaplerRequest;
@@ -121,6 +122,10 @@ public final class BatchRun extends Actionable implements Executable, Comparable
             baseColor = previous.getIconColor();
 
         return baseColor.anime();
+    }
+
+    public String getBuildStatusIconClassName() {
+      return getIconColor().getIconClassName();
     }
 
     public String getBuildStatusUrl() {
