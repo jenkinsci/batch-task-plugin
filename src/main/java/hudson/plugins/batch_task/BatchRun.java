@@ -123,7 +123,7 @@ public final class BatchRun extends Actionable implements Executable, Comparable
 
         return baseColor.anime();
     }
-    
+
     public String getBuildStatusIconClassName() {
       return getIconColor().getIconClassName();
     }
