@@ -16,6 +16,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.framework.io.LargeText;
+import org.kohsuke.stapler.verb.POST;
 
 import java.io.File;
 import java.io.FileOutputStream;

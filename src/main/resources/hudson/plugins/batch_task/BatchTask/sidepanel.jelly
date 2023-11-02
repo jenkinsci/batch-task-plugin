@@ -15,11 +15,11 @@
       <l:task icon="icon-previous icon-md" href="../../" title="${%Back to Task List}" />
       <j:if test="${it.hasBuildPermission()}">
         <j:if test="${!it.disabled}">
-          <l:task icon="icon-clock icon-md" href="${url}/execute" title="${%Build Now}" />
+          <l:task icon="icon-clock icon-md" href="${url}/execute" title="${%Build Now}" post="true" />
         </j:if>
       </j:if>
       <j:if test="${it.hasDeletePermission()}">
-        <l:task icon="icon-edit-delete icon-md" href="${url}/delete" title="${%Delete Task}" />
+        <l:task icon="icon-edit-delete icon-md" href="${url}/doDelete" post="true" requiresConfirmation="true" title="${%Delete Task}" />
       </j:if>
       <!-- Configure doesn't seem to lead anywhere -->
       <!--j:if test="${it.hasConfigurePermission()}">
