@@ -9,14 +9,14 @@
     </parent>
 
     <artifactId>batch-task</artifactId>
-    <version>${revision}${changelist}</version>
+    <version>${revision}.${changelist}</version>
     <packaging>hpi</packaging>
     <name>Jenkins batch task plugin</name>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/Batch+Task+Plugin</url>
 
     <properties>
-        <revision>1.20</revision>
-        <changelist>-SNAPSHOT</changelist>
+        <revision>1</revision>
+        <changelist>999999-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/batch-task-plugin</gitHubRepo>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
         <!-- remember to change the io.jenkins.tools.bom artifact when changing this -->
