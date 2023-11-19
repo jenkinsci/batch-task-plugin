@@ -27,6 +27,7 @@ public class BatchRunTest {
         BatchTask batchTask = new BatchTask("test", "echo hello");
         BatchTaskProperty batchTaskProperty = new BatchTaskProperty(batchTask);
         freeStyleProject.addProperty(batchTaskProperty);
+        batchTaskProperty.setOwner(freeStyleProject);
 
         // now this should fail
         r.jenkins.getQueue().schedule(batchTask, 0).getFuture().get();

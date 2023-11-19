@@ -2,11 +2,7 @@ package hudson.plugins.batch_task;
 
 import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.Extension;
-import hudson.model.AbstractProject;
-import hudson.model.Action;
-import hudson.model.Job;
-import hudson.model.JobProperty;
-import hudson.model.JobPropertyDescriptor;
+import hudson.model.*;
 import hudson.util.EditDistance;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
@@ -39,8 +35,7 @@ public class BatchTaskProperty extends JobProperty<AbstractProject<?,?>> {
     protected void setOwner(AbstractProject<?, ?> owner) {
         super.setOwner(owner);
         for (BatchTask t : tasks) {
-            t.owner = owner;
-            t.parent = this;
+            t.setParentProperty(this);
         }
     }
 

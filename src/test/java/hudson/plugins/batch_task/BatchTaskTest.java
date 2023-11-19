@@ -23,6 +23,7 @@
  */
 package hudson.plugins.batch_task;
 
+import hudson.widgets.HistoryWidget;
 import org.htmlunit.html.HtmlPage;
 
 import hudson.Functions;
@@ -40,6 +41,8 @@ import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -87,7 +90,9 @@ public class BatchTaskTest {
             task = new BatchTask("test",
                     "echo \"$TASK_ID:$GLOBAL:$OVERRIDE_ME:$HUDSON_USER\"\n");
         }
-        p.addProperty(new BatchTaskProperty(task));
+        BatchTaskProperty batchTaskProperty = new BatchTaskProperty(task);
+        p.addProperty(batchTaskProperty);
+        batchTaskProperty.setOwner(p);
         FreeStyleBuild freeStyleBuild = p.scheduleBuild2(0).get();
         while (freeStyleBuild.isBuilding()) {
             Thread.sleep(100);
@@ -102,6 +107,12 @@ public class BatchTaskTest {
         String log = Util.loadFile(run.getLogFile());
         assertTrue("Expected 1-1:global-property:bar:anonymous in task output: " + log,
                 log.contains("1-1:global-property:bar:anonymous"));
+
+        Iterable<BatchRun> iterable = task.getRuns();
+        List<BatchRun> runs = new ArrayList<>();
+        iterable.forEach(runs::add);
+
+        assertEquals("Runs count is 1", 1, runs.size());
     }
 
     /**
@@ -111,7 +122,9 @@ public class BatchTaskTest {
     public void testInvoker() throws Exception {
         FreeStyleProject p = r.createFreeStyleProject("tasker");
         BatchTask task = new BatchTask("test", "echo hello\n");
-        p.addProperty(new BatchTaskProperty(task));
+        BatchTaskProperty batchTaskProperty = new BatchTaskProperty(task);
+        p.addProperty(batchTaskProperty);
+        batchTaskProperty.setOwner(p);
         p.scheduleBuild2(0).get();
         FreeStyleProject up = r.createFreeStyleProject("invoker");
         up.getPublishersList().add(new BatchTaskInvoker(

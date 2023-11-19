@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  *
  * @author Kohsuke Kawaguchi
  */
-public final class BatchRun extends Actionable implements Executable, Comparable<BatchRun> {
+public final class BatchRun extends Run<BatchTask.BatchJob, BatchRun> implements Executable, Comparable<BatchRun> {
     /**
      * Build result.
      * If null, we are still building.
@@ -60,7 +60,8 @@ public final class BatchRun extends Actionable implements Executable, Comparable
      */
     protected long duration;
 
-    protected BatchRun(Calendar timestamp, BatchRunAction parent, int id, BatchTask task) {
+    protected BatchRun(Calendar timestamp, BatchRunAction parent, int id, BatchTask task) throws IOException {
+        super(task.getJob());
         this.timestamp = timestamp;
         this.parent = parent;
         this.id = id;
@@ -96,7 +97,7 @@ public final class BatchRun extends Actionable implements Executable, Comparable
     }
 
     @NonNull
-    public BatchTask getParent() {
+    public BatchTask getParentTask() {
         BatchTaskAction jta = parent.owner.getProject().getAction(BatchTaskAction.class);
         return jta.getTask(taskName);
     }
@@ -176,20 +177,20 @@ public final class BatchRun extends Actionable implements Executable, Comparable
         return parent.owner.getUrl() + "batchTasks/" + id;
     }
 
-    public String getSearchUrl() {
+    /*public String getSearchUrl() {
         return getUrl();
-    }
+    }*/
 
     public String getDisplayName() {
         return taskName + ' ' + getBuildNumber();
     }
 
-    public String getNumber() {
-        return parent.owner.getNumber() + "-" + id;
+    public String getNumberAsString() {
+        return "" + parent.owner.getNumber() + "-" + id;
     }
 
     public String getBuildNumber() {
-        return "#" + parent.owner.getNumber() + '-' + id;
+        return "#" + getNumberAsString();
     }
 
     /**
@@ -223,7 +224,7 @@ public final class BatchRun extends Actionable implements Executable, Comparable
 
             Launcher launcher = node.createLauncher(listener);
 
-            BatchTask task = getParent();
+            BatchTask task = getParentTask();
             if (task == null)
                 throw new AbortException("ERROR: undefined task \"" + taskName + "\"");
             AbstractBuild<?, ?> lb = task.owner.getLastBuild();
@@ -249,7 +250,7 @@ public final class BatchRun extends Actionable implements Executable, Comparable
                         // Apply global and node properties
                         for (Environment e : buildEnvironments) e.buildEnvVars(env);
                         // Our task id
-                        env.put("TASK_ID", getNumber());
+                        env.put("TASK_ID", getNumberAsString());
                         // User who triggered this task run, if applicable
                         out:
                         for (CauseAction ca : getActions(CauseAction.class))
@@ -358,7 +359,7 @@ public final class BatchRun extends Actionable implements Executable, Comparable
     }
 
     public long getEstimatedDuration() {
-        return getParent().getEstimatedDuration();
+        return getParentTask().getEstimatedDuration();
     }
 
     private static final Logger LOGGER = Logger.getLogger(BatchRun.class.getName());
