@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.75</version> <!-- See https://github.com/jenkinsci/plugin-pom/releases for available versions-->
+        <version>4.76</version> <!-- See https://github.com/jenkinsci/plugin-pom/releases for available versions-->
         <relativePath />
     </parent>
 
